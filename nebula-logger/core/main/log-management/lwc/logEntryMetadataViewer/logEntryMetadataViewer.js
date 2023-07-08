@@ -49,6 +49,14 @@ export default class LogEntryMetadataViewer extends LightningElement {
         return !!this._logEntry;
     }
 
+    get hasFullExceptionApexClass() {
+        return !!this._logEntryExceptionApexClassCode;
+    }
+
+    get hasFullOriginApexClass() {
+        return !!this._logEntryOriginApexClassCode;
+    }
+
     get showMessageMaskedField() {
         return !!getFieldValue(this._logEntry, MESSAGE_MASKED_FIELD);
     }
@@ -57,10 +65,8 @@ export default class LogEntryMetadataViewer extends LightningElement {
         return !!getFieldValue(this._logEntry, MESSAGE_TRUNCATED_FIELD);
     }
 
-    get showExceptionApexClassInformation() {
-        const exceptionType = getFieldValue(this._logEntry, EXCEPTION_TYPE_FIELD);
-        console.log('>>> exceptionType: ' + exceptionType);
-        return !!exceptionType;
+    get showExceptionDetails() {
+        return !!getFieldValue(this._logEntry, EXCEPTION_TYPE_FIELD);
     }
 
     @wire(getMetadata, {
@@ -103,7 +109,7 @@ export default class LogEntryMetadataViewer extends LightningElement {
                 this.originApexCodeSnippet = { ...JSON.parse(originApexCodeSnippetValue), ...{ language: 'apex', title: apexClassName } };
             }
 
-            if (this.showExceptionApexClassInformation) {
+            if (this.showExceptionDetails) {
                 const exceptionApexCodeSnippetValue = getFieldValue(this._logEntry, EXCEPTION_APEX_CLASS_SNIPPET_FIELD);
                 if (exceptionApexCodeSnippetValue) {
                     const apexClassName = getFieldValue(this._logEntry, EXCEPTION_APEX_CLASS_NAME_FIELD) + '.cls';

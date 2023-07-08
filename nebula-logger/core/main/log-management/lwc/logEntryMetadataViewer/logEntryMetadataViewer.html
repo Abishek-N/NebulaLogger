@@ -25,9 +25,11 @@
                                 target-line-number={originApexCodeSnippet.targetLineNumber}
                             >
                                 <span slot="title">{originApexCodeSnippet.title}</span>
-                                <span slot="actions">
-                                    <lightning-button data-id="origin-apex-class" icon-name="utility:apex" label="View Apex Class" onclick={handleShowModal} variant="brand"></lightning-button>
-                                </span>
+                                <template if:true={hasFullOriginApexClass}>
+                                    <span slot="actions">
+                                        <lightning-button data-id="origin-apex-class" icon-name="utility:apex" label="View Apex Class" onclick={handleShowModal} variant="brand"></lightning-button>
+                                    </span>
+                                </template>
                             </c-logger-code-viewer>
                         </lightning-layout-item>
                     </template>
@@ -36,7 +38,7 @@
         </c-logger-page-section>
 
         <!-- Exception Details -->
-        <template if:true={showExceptionApexClassInformation}>
+        <template if:true={showExceptionDetails}>
             <c-logger-page-section section-title={sectionTitleExceptionDetails}>
                 <span slot="sectionContent">
                     <lightning-layout multiple-rows vertical-align="start">
@@ -56,9 +58,11 @@
                                     target-line-number={exceptionApexCodeSnippet.targetLineNumber}
                                 >
                                     <span slot="title">{exceptionApexCodeSnippet.title}</span>
-                                    <span slot="actions">
-                                        <lightning-button data-id="exception-apex-class" icon-name="utility:apex" label="View Apex Class" onclick={handleShowModal} variant="brand"></lightning-button>
-                                    </span>
+                                    <template if:true={hasFullExceptionApexClass}>
+                                        <span slot="actions">
+                                            <lightning-button data-id="exception-apex-class" icon-name="utility:apex" label="View Apex Class" onclick={handleShowModal} variant="brand"></lightning-button>
+                                        </span>
+                                    </template>
                                 </c-logger-code-viewer>
                             </lightning-layout-item>
                         </template>
