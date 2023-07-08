@@ -9,7 +9,13 @@ export default class LoggerCodeViewer extends LightningElement {
     @api startingLineNumber;
     @api targetLineNumber;
 
+    isLoaded = false;
+
     renderedCallback() {
+        if (this.isLoaded) {
+            return;
+        }
+
         Promise.all([loadScript(this, loggerStaticResources + '/prism.js'), loadStyle(this, loggerStaticResources + '/prism.css')])
             .then(() => {
                 const container = this.template.querySelector('.container');
@@ -18,6 +24,7 @@ export default class LoggerCodeViewer extends LightningElement {
                     `<code class="language-${this.language}">${this.code}</code>` +
                     `</pre>`;
                 Prism.highlightAll();
+                this.isLoaded = true;
             })
             .catch(error => {
                 this.dispatchEvent(

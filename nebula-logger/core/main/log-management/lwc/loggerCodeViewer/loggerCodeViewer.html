@@ -6,6 +6,11 @@
         <div class="slds-m-horizontal_medium slds-m-top_medium" slot="actions">
             <slot name="actions"></slot>
         </div>
+        <template if:false={isLoaded}>
+            <div class="slds-is-relative" style="min-height: 6em">
+                <lightning-spinner variant="inverse"></lightning-spinner>
+            </div>
+        </template>
         <div class="container line-numbers" lwc:dom="manual"></div>
     </lightning-card>
 </template>
