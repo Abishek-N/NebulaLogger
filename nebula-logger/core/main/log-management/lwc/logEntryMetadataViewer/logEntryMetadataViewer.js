@@ -73,11 +73,7 @@ export default class LogEntryMetadataViewer extends LightningElement {
         recordId: '$recordId'
     })
     wiredLogEntryMetadata({ error, data }) {
-        console.log('>>> running wiredLogEntryMetadata', this.recordId);
-        console.log('>>> wiredLogEntryMetadata data', data);
-        console.log('>>> wiredLogEntryMetadata error', error);
         if (data) {
-            console.log('>>> found data', data);
             this._logEntryMetadata = data;
             this._logEntryExceptionApexClassCode = data.exceptionApexClassCode;
             this._logEntryOriginApexClassCode = data.originApexClassCode;
@@ -93,19 +89,11 @@ export default class LogEntryMetadataViewer extends LightningElement {
         fields: LOG_ENTRY_FIELDS
     })
     wiredLogEntry({ error, data }) {
-        console.log('>>> running wiredLogEntry', this.recordId);
-        console.log('>>> wiredLogEntry data', data);
-        console.log('>>> wiredLogEntry error', error);
-        console.log('>>> EXCEPTION_APEX_CLASS_SNIPPET_FIELD', EXCEPTION_APEX_CLASS_SNIPPET_FIELD);
-        console.log('>>> FLOW_ACTIVE_VERSION_ID_FIELD', FLOW_ACTIVE_VERSION_ID_FIELD);
-        console.log('>>> LOGGING_APEX_CLASS_SNIPPET_FIELD', LOGGING_APEX_CLASS_SNIPPET_FIELD);
         if (data) {
-            console.log('>>> found data', data);
             this._logEntry = data;
             const originApexCodeSnippetValue = getFieldValue(this._logEntry, LOGGING_APEX_CLASS_SNIPPET_FIELD);
             if (originApexCodeSnippetValue) {
                 const apexClassName = getFieldValue(this._logEntry, LOGGING_APEX_CLASS_NAME_FIELD) + '.cls';
-                console.log('>>> origin apex class name: ' + apexClassName);
                 this.originApexCodeSnippet = { ...JSON.parse(originApexCodeSnippetValue), ...{ language: 'apex', title: apexClassName } };
             }
 
@@ -113,12 +101,9 @@ export default class LogEntryMetadataViewer extends LightningElement {
                 const exceptionApexCodeSnippetValue = getFieldValue(this._logEntry, EXCEPTION_APEX_CLASS_SNIPPET_FIELD);
                 if (exceptionApexCodeSnippetValue) {
                     const apexClassName = getFieldValue(this._logEntry, EXCEPTION_APEX_CLASS_NAME_FIELD) + '.cls';
-                    console.log('>>> exception apex class name: ' + apexClassName);
                     this.exceptionApexCodeSnippet = { ...JSON.parse(exceptionApexCodeSnippetValue), ...{ language: 'apex', title: apexClassName } };
                 }
             }
-            console.log('>>> matching origin code snippet', JSON.parse(JSON.stringify(this.originApexCodeSnippet)));
-            console.log('>>> matching exception code snippet', JSON.parse(JSON.stringify(this.exceptionApexCodeSnippet)));
         } else if (error) {
             this.originApexCodeSnippet = undefined;
             this.exceptionApexCodeSnippet = undefined;
@@ -127,16 +112,10 @@ export default class LogEntryMetadataViewer extends LightningElement {
 
     handleShowModal(event) {
         this.modalApexCodeSnippet = undefined;
-        // TODO check for either data id, and set modal content property
         const buttonId = event.target.dataset.id;
-        console.log('>>> running handleShowModal for button ID', buttonId);
         switch(buttonId) {
             case 'exception-apex-class':
-                console.log('>>> running case "exception-apex-class"');
                 if (this._logEntryMetadata.exceptionApexClassCode) {
-                    console.log('>>> no code found for "exception-apex-class"');
-                    console.log('seems like we have code for _logEntryMetadata.exceptionApexClassCode!');
-                    console.log('>>> this._logEntryMetadata.exceptionApexClassCode', this._logEntryMetadata.exceptionApexClassCode);
                     this.showModalWarning = this._logEntryMetadata.hasExceptionApexClassBeenModified;
                     this.modalApexCodeSnippet = {
                         code: this._logEntryMetadata.exceptionApexClassCode,
@@ -146,11 +125,7 @@ export default class LogEntryMetadataViewer extends LightningElement {
                 }
                 break;
             case 'origin-apex-class':
-                console.log('>>> running case "origin-apex-class"');
                 if (this._logEntryMetadata.originApexClassCode) {
-                    console.log('>>> no code found for "origin-apex-class"');
-                    console.log('seems like we have code for _logEntryMetadata.originApexClassCode!');
-                    console.log('>>> this._logEntryMetadata.originApexClassCode', this._logEntryMetadata.originApexClassCode);
                     this.showModalWarning = this._logEntryMetadata.hasOriginApexClassBeenModified;
                     this.modalApexCodeSnippet = {
                         code: this._logEntryMetadata.originApexClassCode,
@@ -162,10 +137,6 @@ export default class LogEntryMetadataViewer extends LightningElement {
 
         }
         this.modalTitle = 'Apex Class ' + this.modalApexCodeSnippet.title;
-        console.log('>>> finished processing modal snippet');
-        console.log('>>> this.modalApexCodeSnippet', JSON.parse(JSON.stringify(this.modalApexCodeSnippet)));
-        // - data-id="origin-apex-class"
-        // - data-id="exception-apex-class"
         this.showModal = true;
     }
 
