@@ -1,31 +1,24 @@
 /**
 //  * @description An example Apex class for utilizing Nebula Logger.
  */
-public with sharing class ExampleClassWithLogging {
+public with sharing class AnotherClassWithLogging {
     /**
      * @description Default constructor, logs initial message but does not save said log.
      */
-    public ExampleClassWithLogging() {
-        LogMessage logMessage = new LogMessage('new instance of {0} initialized', ExampleClassWithLogging.class.getName());
+    public AnotherClassWithLogging() {
+        LogMessage logMessage = new LogMessage('new instance of {0} initialized', AnotherClassWithLogging.class.getName());
         Logger.info(logMessage);
     }
 
     /**
      * @description Example method for logging that saves log and writes a log entry.
      */
-    public void doSomething() {
-        Logger.info('running doSomething() method!');
+    public void throwSomeException() {
+        Logger.info('running throwSomeException() method!');
 
-        try {
-            new ExampleInnerClass().doAnInnerSomething();
-            new AnotherClassWithLogging().throwSomeException();
-        } catch(Exception ex) {
-            Logger.error('some error, oh no!', ex);
-            Logger.saveLog();
-            throw ex;
-        } finally {
-            Logger.saveLog();
-        }
+        Account problematicAccount = new Account();
+        Logger.info('going to cause a DML exception here by inserting an account with no fields populated', problematicAccount);
+        insert problematicAccount;
     }
 
     /**
@@ -45,6 +38,10 @@ public with sharing class ExampleClassWithLogging {
          */
         public void doAnInnerSomething() {
             Logger.info('running doAnInnerSomething() method!');
+            System.DmlException exceptionToThrow = new System.DmlException('some DML issue, whoops!');
+            Logger.warn('about to throw exception', exceptionToThrow);
+            Logger.saveLog();
+            throw exceptionToThrow;
         }
     }
 }

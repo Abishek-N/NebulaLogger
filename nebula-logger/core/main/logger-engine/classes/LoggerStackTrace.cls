@@ -89,6 +89,7 @@ public without sharing class LoggerStackTrace {
             // Example: Class.ExampleClassWithLogging.throwSomeException: line 25, column 1
             this.apexCodeLineNumber = Integer.valueOf(firstStackTraceLine.substringAfter('line ').substringBefore(','));
             this.apexTopLevelClassName = firstStackTraceLine.substringAfter('Class.').substringBefore('.');
+            // FIXME not quite working as expected
             this.apexInnerClassName = firstStackTraceLine.substringAfter('Class.' + apexTopLevelClassName + '.').substringBeforeLast('.');
             this.apexMethodName = firstStackTraceLine.substringAfter(apexTopLevelClassName + '.').substringBefore(':');
 

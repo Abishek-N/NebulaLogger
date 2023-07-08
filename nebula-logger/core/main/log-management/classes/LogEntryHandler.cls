@@ -69,7 +69,7 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
         }
 
         Map<String, ApexClass> classNameToApexClass = new Map<String, ApexClass>();
-        for (ApexClass apexClass : LogManagementDataSelector.getInstance().getApexClassesWithBody(apexClassNames)) {
+        for (ApexClass apexClass : LogManagementDataSelector.getInstance().getApexClasses(apexClassNames)) {
             classNameToApexClass.put(apexClass.Name, apexClass);
         }
 
@@ -143,7 +143,7 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
         }
 
         Map<String, ApexClass> classNameToApexClass = new Map<String, ApexClass>();
-        for (ApexClass apexClass : LogManagementDataSelector.getInstance().getApexClassesWithBody(apexClassNames)) {
+        for (ApexClass apexClass : LogManagementDataSelector.getInstance().getApexClasses(apexClassNames)) {
             classNameToApexClass.put(apexClass.Name, apexClass);
         }
 
@@ -439,7 +439,7 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
         private void calculateLineNumbers() {
             // TODO consider making these values configurable with 2 new LoggerParameter__mdt records
             final Integer targetLeadingLines = 8;
-            final Integer targetTrailingLines = 0;
+            final Integer targetTrailingLines = 4;
 
             this.startingLineNumber = this.targetLineNumber - targetLeadingLines;
             if (this.startingLineNumber <= 0) {
