@@ -1,19 +1,19 @@
 <template>
     <template if:true={hasLoaded}>
         <!-- Origin Details -->
-        <c-logger-page-section section-title={sectionTitleOriginDetails}>
-            <span slot="sectionContent">
+        <c-logger-page-section title={sectionTitleOriginDetails}>
+            <span slot="content">
                 <lightning-layout multiple-rows vertical-align="start">
                     <lightning-layout-item size="12">
                         <lightning-record-view-form record-id={recordId} object-api-name={objectApiName}>
-                                <lightning-output-field class="slds-form-element_readonly" field-name="Message__c"></lightning-output-field>
-                                <template if:true={showMessageMaskedField}>
-                                    <lightning-output-field class="slds-form-element_readonly" field-name="MessageMasked__c"></lightning-output-field>
-                                </template>
-                                <template if:true={showMessageTruncatedField}>
-                                    <lightning-output-field class="slds-form-element_readonly" field-name="MessageTruncated__c"></lightning-output-field>
-                                </template>
-                                <lightning-output-field class="slds-form-element_readonly" field-name="StackTrace__c"></lightning-output-field>
+                            <lightning-output-field class="slds-form-element_readonly" field-name="Message__c"></lightning-output-field>
+                            <template if:true={showMessageMaskedField}>
+                                <lightning-output-field class="slds-form-element_readonly" field-name="MessageMasked__c"></lightning-output-field>
+                            </template>
+                            <template if:true={showMessageTruncatedField}>
+                                <lightning-output-field class="slds-form-element_readonly" field-name="MessageTruncated__c"></lightning-output-field>
+                            </template>
+                            <lightning-output-field class="slds-form-element_readonly" field-name="StackTrace__c"></lightning-output-field>
                         </lightning-record-view-form>
                     </lightning-layout-item>
                     <template if:true={originApexCodeSnippet}>
@@ -27,7 +27,13 @@
                                 <span slot="title">{originApexCodeSnippet.title}</span>
                                 <template if:true={hasFullOriginApexClass}>
                                     <span slot="actions">
-                                        <lightning-button data-id="origin-apex-class" icon-name="utility:apex" label="View Apex Class" onclick={handleShowModal} variant="brand"></lightning-button>
+                                        <lightning-button
+                                            data-id="origin-apex-class"
+                                            icon-name="utility:apex"
+                                            label="View Apex Class"
+                                            onclick={handleShowModal}
+                                            variant="brand"
+                                        ></lightning-button>
                                     </span>
                                 </template>
                             </c-logger-code-viewer>
@@ -39,8 +45,8 @@
 
         <!-- Exception Details -->
         <template if:true={showExceptionDetails}>
-            <c-logger-page-section section-title={sectionTitleExceptionDetails}>
-                <span slot="sectionContent">
+            <c-logger-page-section title={sectionTitleExceptionDetails}>
+                <span slot="content">
                     <lightning-layout multiple-rows vertical-align="start">
                         <lightning-layout-item size="12">
                             <lightning-record-view-form record-id={recordId} object-api-name={objectApiName}>
@@ -60,7 +66,13 @@
                                     <span slot="title">{exceptionApexCodeSnippet.title}</span>
                                     <template if:true={hasFullExceptionApexClass}>
                                         <span slot="actions">
-                                            <lightning-button data-id="exception-apex-class" icon-name="utility:apex" label="View Apex Class" onclick={handleShowModal} variant="brand"></lightning-button>
+                                            <lightning-button
+                                                data-id="exception-apex-class"
+                                                icon-name="utility:apex"
+                                                label="View Apex Class"
+                                                onclick={handleShowModal}
+                                                variant="brand"
+                                            ></lightning-button>
                                         </span>
                                     </template>
                                 </c-logger-code-viewer>
@@ -71,16 +83,14 @@
             </c-logger-page-section>
         </template>
     </template>
+
+    <!-- Modal Code Viewer -->
     <template if:true={showModal}>
-        <section class="slds-modal slds-fade-in-open slds-modal_medium" onkeydown={handleKeyDown} role="dialog" tabindex="-1">
+        <section class="slds-modal slds-fade-in-open slds-modal_large" onkeydown={handleKeyDown} role="dialog" tabindex="-1">
             <div class="slds-modal__container" onkeydown={handleKeyDown}>
                 <!-- Modal header -->
                 <header class="slds-modal__header">
-                    <button
-                        class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
-                        title="Close"
-                        onclick={handleHideModal}
-                    >
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={handleHideModal}>
                         <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small"></lightning-icon>
                     </button>
                     <h2 class="slds-text-heading_medium slds-hyphenate">{modalTitle}</h2>
@@ -92,7 +102,7 @@
                         <span class="slds-assistive-text">warning</span>
                         <lightning-icon class="slds-m-right_x-small" icon-name="utility:warning" size="x-small"></lightning-icon>
                         <h2>This Apex class has been modified after this log entry was generated.</h2>
-                      </div>
+                    </div>
                 </template>
                 <div class="slds-modal__content slds-p-around_medium">
                     <c-logger-code-viewer

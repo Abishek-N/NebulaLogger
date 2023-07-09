@@ -2,11 +2,7 @@ import { LightningElement, api, wire } from 'lwc';
 import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
 import getMetadata from '@salesforce/apex/LogEntryMetadataViewerController.getMetadata';
 
-// TODO move to a separate, dedicated Apex controller class or LWC service (?)
-// import getLogEntry from '@salesforce/apex/LogEntrySectionController.getLogEntry';
-
 import LOG_ENTRY_OBJECT from '@salesforce/schema/LogEntry__c';
-
 import EXCEPTION_APEX_CLASS_NAME_FIELD from '@salesforce/schema/LogEntry__c.ExceptionApexClassName__c';
 import EXCEPTION_APEX_CLASS_SNIPPET_FIELD from '@salesforce/schema/LogEntry__c.ExceptionApexClassSnippet__c';
 import EXCEPTION_TYPE_FIELD from '@salesforce/schema/LogEntry__c.ExceptionType__c';
@@ -113,7 +109,9 @@ export default class LogEntryMetadataViewer extends LightningElement {
     handleShowModal(event) {
         this.modalApexCodeSnippet = undefined;
         const buttonId = event.target.dataset.id;
-        switch(buttonId) {
+
+        // eslint-disable-next-line default-case
+        switch (buttonId) {
             case 'exception-apex-class':
                 if (this._logEntryMetadata.exceptionApexClassCode) {
                     this.showModalWarning = this._logEntryMetadata.hasExceptionApexClassBeenModified;
@@ -121,7 +119,7 @@ export default class LogEntryMetadataViewer extends LightningElement {
                         code: this._logEntryMetadata.exceptionApexClassCode,
                         language: this.exceptionApexCodeSnippet.language,
                         title: this.exceptionApexCodeSnippet.title
-                     };
+                    };
                 }
                 break;
             case 'origin-apex-class':
@@ -131,10 +129,9 @@ export default class LogEntryMetadataViewer extends LightningElement {
                         code: this._logEntryMetadata.originApexClassCode,
                         language: this.originApexCodeSnippet.language,
                         title: this.originApexCodeSnippet.title
-                     };
+                    };
                 }
                 break;
-
         }
         this.modalTitle = 'Apex Class ' + this.modalApexCodeSnippet.title;
         this.showModal = true;

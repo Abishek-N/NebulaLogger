@@ -8,6 +8,8 @@
 .sf/
 .sfdx/
 .vscode/
+nebula-logger/**/staticresources/
+temp/
 test-coverage/
 
 # NPM

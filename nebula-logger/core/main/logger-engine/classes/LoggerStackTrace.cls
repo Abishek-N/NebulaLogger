@@ -46,26 +46,6 @@ public without sharing class LoggerStackTrace {
         this.setApexClassDetails();
     }
 
-    // public Integer getApexCodeLineNumber() {
-    //     return this.apexCodeLineNumber;
-    // }
-
-    // public String getApexTopLevelClassName() {
-    //     return this.apexTopLevelClassName;
-    // }
-
-    // public String getApexMethodName() {
-    //     return this.apexMethodName;
-    // }
-
-    // public String getOriginLocation() {
-    //     return this.originLocation;
-    // }
-
-    // public String getParsedStackTraceString() {
-    //     return this.parsedStackTraceString;
-    // }
-
     private void setApexClassDetails() {
         if (this.isValidStackTrace(this.originalStackTraceString) == false) {
             return;
@@ -88,25 +68,9 @@ public without sharing class LoggerStackTrace {
 
             // Example: Class.ExampleClassWithLogging.throwSomeException: line 25, column 1
             this.apexCodeLineNumber = Integer.valueOf(firstStackTraceLine.substringAfter('line ').substringBefore(','));
+            this.apexMethodName = firstStackTraceLine.substringBefore(':').substringAfterLast('.');
             this.apexTopLevelClassName = firstStackTraceLine.substringAfter('Class.').substringBefore('.');
-            // FIXME not quite working as expected
-            this.apexInnerClassName = firstStackTraceLine.substringAfter('Class.' + apexTopLevelClassName + '.').substringBeforeLast('.');
-            this.apexMethodName = firstStackTraceLine.substringAfter(apexTopLevelClassName + '.').substringBefore(':');
-
-            // TODO
-            // String topLevelApexTopLevelClassName = logEntry.OriginLocation__c?.substringBefore('.');
-            // ApexClass topLevelApexClass = classNameToApexClass.get(topLevelApexTopLevelClassName);
-            // if (topLevelApexClass == null) {
-            //     return;
-            // }
-
-            // String methodName = logEntry.OriginLocation__c.substringAfterLast('.');
-            // String innerApexTopLevelClassName = logEntry.OriginLocation__c.substringAfter(topLevelApexTopLevelClassName + '.').substringBeforeLast('.');
-            // if (innerApexTopLevelClassName == topLevelApexTopLevelClassName || innerApexTopLevelClassName == methodName) {
-            //     innerApexTopLevelClassName = null;
-            // } else if (innerApexTopLevelClassName.startsWith(topLevelApexTopLevelClassName + '.')) {
-            //     innerApexTopLevelClassName = innerApexTopLevelClassName.substringAfter(topLevelApexTopLevelClassName + '.');
-            // }
+            this.apexInnerClassName = firstStackTraceLine.substringAfter('Class.' + apexTopLevelClassName + '.').substringBeforeLast('.' + this.apexMethodName);
         }
     }
 

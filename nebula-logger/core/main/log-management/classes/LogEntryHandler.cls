@@ -119,20 +119,11 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
                 continue;
             }
 
-            // String exceptionOriginStackTraceLine = logEntry.ExceptionStackTrace__c.split('\n').get(0);
-            // // Example: Class.ExampleClassWithLogging.throwSomeException: line 25, column 1
-            // String apexClassName = exceptionOriginStackTraceLine.substringAfter('Class.').substringBeforeLast('.');
-            // String methodName = exceptionOriginStackTraceLine.substringAfter(apexClassName + '.').substringBefore(':');
-            // String lineNumberString = exceptionOriginStackTraceLine.substringAfter('line ').substringBefore(',');
-
             LoggerStackTrace stackTrace = new LoggerStackTrace(logEntry.ExceptionStackTrace__c);
             logEntry.ExceptionApexClassName__c = stackTrace.apexTopLevelClassName;
             logEntry.ExceptionApexCodeLineNumber__c = stackTrace.apexCodeLineNumber;
             logEntry.ExceptionApexInnerClassName__c = stackTrace.apexInnerClassName;
             logEntry.ExceptionApexMethodName__c = stackTrace.apexMethodName;
-            // logEntry.ExceptionApexCodeLineNumber__c = Integer.valueOf(lineNumberString);
-            // logEntry.ExceptionApexClassName__c = apexClassName;
-            // logEntry.ExceptionApexMethodName__c = methodName;
 
             apexClassNames.add(stackTrace.apexTopLevelClassName);
             apexLogEntries.add(logEntry);
@@ -153,6 +144,12 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
 
         for (LogEntry__c logEntry : apexLogEntries) {
             ApexClass topLevelApexClass = classNameToApexClass.get(logEntry.ExceptionApexClassName__c);
+            // Queried ApexClass fields
+            logEntry.ExceptionApexClassApiVersion__c = 'v' + topLevelApexClass.ApiVersion;
+            logEntry.ExceptionApexClassCreatedDate__c = topLevelApexClass.CreatedDate;
+            logEntry.ExceptionApexClassId__c = topLevelApexClass.Id;
+            logEntry.ExceptionApexClassLastModifiedDate__c = topLevelApexClass.LastModifiedDate;
+            logEntry.ExceptionApexClassSnippet__c = JSON.serializePretty(new ApexCodeSnippet(topLevelApexClass, Integer.valueOf(logEntry.ApexCodeLineNumber__c)));
             logEntry.ExceptionApexClassSnippet__c = JSON.serializePretty(
                 new ApexCodeSnippet(topLevelApexClass, Integer.valueOf(logEntry.ExceptionApexCodeLineNumber__c))
             );
@@ -417,26 +414,23 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
         return sobjectType;
     }
 
+    @SuppressWarnings('PMD.ApexDoc')
     @TestVisible
     private class ApexCodeSnippet {
-        public Integer startingLineNumber { get; set; }
-        public Integer endingLineNumber { get; set; }
-        public Integer targetLineNumber { get; set; }
-        public String code { get; set; }
-
-        public transient ApexClass apexClass;
-        public transient List<String> allCodeLines;
+        public String code { get; private set; }
+        public Integer startingLineNumber { get; private set; }
+        public Integer endingLineNumber { get; private set; }
+        public Integer targetLineNumber { get; private set; }
 
         public ApexCodeSnippet(ApexClass apexClass, Integer targetLineNumber) {
-            this.apexClass = apexClass;
             this.targetLineNumber = targetLineNumber;
-            this.allCodeLines = this.apexClass.Body.split('\n');
 
-            this.calculateLineNumbers();
-            this.setCode();
+            List<String> allCodeLines = apexClass.Body.split('\n');
+            this.calculateLineNumbers(apexClass, allCodeLines.size());
+            this.setCode(apexClass, allCodeLines);
         }
 
-        private void calculateLineNumbers() {
+        private void calculateLineNumbers(ApexClass apexClass, Integer numberOFCodeLines) {
             // TODO consider making these values configurable with 2 new LoggerParameter__mdt records
             final Integer targetLeadingLines = 8;
             final Integer targetTrailingLines = 4;
@@ -447,17 +441,17 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
             }
 
             this.endingLineNumber = this.targetLineNumber + targetTrailingLines;
-            if (this.endingLineNumber > this.allCodeLines.size()) {
-                this.endingLineNumber = this.allCodeLines.size();
+            if (this.endingLineNumber > numberOFCodeLines) {
+                this.endingLineNumber = numberOFCodeLines;
             }
         }
 
-        private void setCode() {
+        private void setCode(ApexClass apexClass, List<String> allCodeLines) {
             List<String> snippetCodeLines = new List<String>();
             for (Integer i = this.startingLineNumber; i <= this.endingLineNumber; i++) {
                 // Indexes in arrays start with 0, but code lines start with 1
                 Integer targetLineNumber = i - 1;
-                snippetCodeLines.add(this.allCodeLines.get(targetLineNumber));
+                snippetCodeLines.add(allCodeLines.get(targetLineNumber));
             }
 
             this.code = String.join(snippetCodeLines, '\n');

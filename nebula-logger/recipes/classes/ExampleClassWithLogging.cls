@@ -1,6 +1,7 @@
 /**
 //  * @description An example Apex class for utilizing Nebula Logger.
  */
+@SuppressWarnings('PMD.ApexCrudViolation')
 public with sharing class ExampleClassWithLogging {
     /**
      * @description Default constructor, logs initial message but does not save said log.

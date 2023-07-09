@@ -54,8 +54,8 @@
                 <div class="slds-modal__content slds-p-around_medium">
                     <!-- Configurable page layout sections, managed in loggerSettingsPageLayout.js -->
                     <template for:each={layoutData.sections} for:item="section">
-                        <c-logger-page-section key={section.key} section-title={section.label}>
-                            <span slot="sectionContent">
+                        <c-logger-page-section key={section.key} title={section.label}>
+                            <span slot="content">
                                 <lightning-layout>
                                     <template for:each={section.columns} for:item="column">
                                         <lightning-layout-item key={column.key} size={column.size}>
@@ -255,8 +255,8 @@
 
                     <!-- Audit fields -->
                     <template if:true={isExistingRecord}>
-                        <c-logger-page-section section-title="System Information">
-                            <span slot="sectionContent">
+                        <c-logger-page-section title="System Information">
+                            <span slot="content">
                                 <lightning-layout>
                                     <lightning-layout-item size="6">
                                         <lightning-input

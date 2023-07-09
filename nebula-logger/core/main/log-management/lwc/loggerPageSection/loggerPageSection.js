@@ -5,19 +5,12 @@ const SECTION_ICON_EXPANDED = 'utility:chevrondown';
 const SECTION_ICON_COLLAPSED = 'utility:chevronright';
 
 export default class LoggerPageSection extends LightningElement {
-    @api
-    section;
-    @api
-    sectionTitle;
+    @api title;
 
     showSectionContent = true;
 
     get sectionToggleIcon() {
-        if (this.showSectionContent) {
-            return SECTION_ICON_EXPANDED;
-        } else {
-            return SECTION_ICON_COLLAPSED;
-        }
+        return this.showSectionContent ? SECTION_ICON_EXPANDED : SECTION_ICON_COLLAPSED;
     }
 
     toggleSection() {

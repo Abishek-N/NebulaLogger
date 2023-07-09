@@ -25,11 +25,11 @@ public without sharing class LogEntryMetadataViewerController {
         ];
 
         // TODO consolidate queries & use selector class
-        if (logEntry.ApexClassId__c != null) {
+        if (logEntry.ApexClassName__c != null) {
             List<ApexClass> possibleMatches = [
                 SELECT Id, Body, LastModifiedBy.Name, LastModifiedBy.Username, LastModifiedDate
                 FROM ApexClass
-                WHERE Id = :logEntry.ApexClassId__c
+                WHERE Name = :logEntry.ApexClassName__c
             ];
             ApexClass matchingApexClass = possibleMatches.size() == 1 ? possibleMatches.get(0) : null;
             metadata.originApexClassCode = matchingApexClass?.Body;
