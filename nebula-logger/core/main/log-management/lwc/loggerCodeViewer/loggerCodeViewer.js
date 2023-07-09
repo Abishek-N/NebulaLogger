@@ -1,5 +1,4 @@
 import { LightningElement, api } from 'lwc';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
 import loggerStaticResources from '@salesforce/resourceUrl/LoggerResources';
 
@@ -29,15 +28,6 @@ export default class LoggerCodeViewer extends LightningElement {
                 // eslint-disable-next-line no-undef
                 Prism.highlightAll();
                 this.isLoaded = true;
-            })
-            .catch(error => {
-                this.dispatchEvent(
-                    new ShowToastEvent({
-                        message: error.message,
-                        title: 'Error loading code viewer',
-                        variant: 'error'
-                    })
-                );
             });
     }
 }
