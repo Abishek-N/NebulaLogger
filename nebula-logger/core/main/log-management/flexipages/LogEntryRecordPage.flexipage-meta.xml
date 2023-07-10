@@ -5,6 +5,18 @@
             <componentInstance>
                 <componentInstanceProperties>
                     <name>actionNames</name>
+                    <valueList>
+                        <valueListItems>
+                            <value>CustomButton.LogEntry__c.ViewRecordSObjectReferenceDocs</value>
+                            <visibilityRule>
+                                <criteria>
+                                    <leftValue>{!Record.RecordSObjectClassification__c}</leftValue>
+                                    <operator>EQUAL</operator>
+                                    <rightValue>Standard Object</rightValue>
+                                </criteria>
+                            </visibilityRule>
+                        </valueListItems>
+                    </valueList>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>collapsed</name>
