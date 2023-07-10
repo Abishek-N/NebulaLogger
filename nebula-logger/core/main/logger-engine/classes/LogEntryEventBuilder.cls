@@ -29,7 +29,6 @@ global with sharing class LogEntryEventBuilder {
     @TestVisible
     private String debugMessage = '';
     private Boolean detailsAreSet = false;
-    private Set<String> ignoredApexClasses = new Set<String>();
     private Boolean shouldSave;
     private Set<String> tags = new Set<String>();
     private Boolean tagDetailsAreSet = true;
@@ -83,6 +82,8 @@ global with sharing class LogEntryEventBuilder {
      */
     @SuppressWarnings('PMD.ExcessiveParameterList, PMD.NcssConstructorCount')
     public LogEntryEventBuilder(LoggerSettings__c userSettings, System.LoggingLevel entryLoggingLevel, Boolean shouldSave, Set<String> ignoredOrigins) {
+        // TODO consider deprecating constructor parameter ignoredOrigins now that LoggerStackTrace manages it
+        LoggerStackTrace.ignoreOrigin(LogEntryEventBuilder.class);
         this.shouldSave = shouldSave;
         if (this.shouldSave() == false) {
             return;
@@ -91,9 +92,6 @@ global with sharing class LogEntryEventBuilder {
         this.userSettings = userSettings;
         this.organizationEnvironmentType = getOrganizationEnvironmentType(userSettings);
         this.entryLoggingLevel = entryLoggingLevel;
-        if (ignoredOrigins != null) {
-            this.ignoredApexClasses.addAll(ignoredOrigins);
-        }
 
         Datetime timestamp = System.now();
         this.logEntryEvent = new LogEntryEvent__e(
@@ -172,12 +170,8 @@ global with sharing class LogEntryEventBuilder {
         }
 
         this.logEntryEvent.ExceptionMessage__c = apexException.getMessage();
+        this.logEntryEvent.ExceptionStackTrace__c = new LoggerStackTrace(apexException).parsedStackTraceString;
         this.logEntryEvent.ExceptionType__c = apexException.getTypeName();
-
-        // Stack traces are not returned for managed packages
-        if (isValidStackTrace(apexException.getStackTraceString()) == true) {
-            this.logEntryEvent.ExceptionStackTrace__c = apexException.getStackTraceString();
-        }
 
         return this;
     }
@@ -639,53 +633,11 @@ global with sharing class LogEntryEventBuilder {
      */
     @SuppressWarnings('PMD.NcssMethodCount')
     global LogEntryEventBuilder parseStackTrace(String stackTraceString) {
-        if (LoggerParameter.ENABLE_STACK_TRACE_PARSING == false || this.shouldSave() == false || isValidStackTrace(stackTraceString) == false) {
+        if (this.shouldSave() == false || LoggerParameter.ENABLE_STACK_TRACE_PARSING == false) {
             return this;
         }
 
-        List<String> stackTraceLines = new List<String>();
-        String previousStackTraceLine;
-        for (String currentStackTraceLine : stackTraceString.split(NEW_LINE_DELIMITER)) {
-            // Duplicate lines are sometimes introduced, so skip the current line if it's the same as the previous line
-            if (currentStackTraceLine == previousStackTraceLine) {
-                continue;
-            }
-
-            // Don't include the logging system's classes in the stack trace
-            Boolean ignoreLine = false;
-            for (String ignoredApexClass : this.ignoredApexClasses) {
-                if (currentStackTraceLine.contains('.' + ignoredApexClass.trim() + '.')) {
-                    ignoreLine = true;
-                    continue;
-                }
-            }
-            // Some lines, especially in the managed package, can result in '()' or '(Nebula)'
-            if (isValidStackTrace(currentStackTraceLine) == false) {
-                ignoreLine = true;
-            }
-
-            if (ignoreLine == false) {
-                previousStackTraceLine = currentStackTraceLine;
-                stackTraceLines.add(currentStackTraceLine);
-            }
-        }
-
-        // In a managed package, we can end up with an invalid (unhelpful) stack trace, so only store when valid
-        stackTraceString = String.join(stackTraceLines, NEW_LINE_DELIMITER);
-        if (isValidStackTrace(stackTraceString)) {
-            String originLocation = stackTraceLines.get(0);
-            if (originLocation.contains(':')) {
-                originLocation = originLocation.substringBefore(':');
-            }
-            if (originLocation.startsWith('Class.')) {
-                originLocation = originLocation.substringAfter('Class.');
-            }
-
-            this.logEntryEvent.OriginLocation__c = originLocation;
-            this.logEntryEvent.StackTrace__c = truncateFieldValue(Schema.LogEntryEvent__e.StackTrace__c, stackTraceString);
-        }
-
-        return this;
+        return this.setStackTraceDetails(new LoggerStackTrace(stackTraceString));
     }
 
     /**
@@ -770,12 +722,17 @@ global with sharing class LogEntryEventBuilder {
     }
 
     private void parseStackTrace() {
-        if (LoggerParameter.ENABLE_STACK_TRACE_PARSING == false) {
+        if (this.shouldSave() == false || LoggerParameter.ENABLE_STACK_TRACE_PARSING == false) {
             return;
         }
 
-        System.DmlException stackTraceException = new System.DmlException();
-        this.parseStackTrace(stackTraceException.getStackTraceString());
+        this.setStackTraceDetails(new LoggerStackTrace());
+    }
+
+    private LogEntryEventBuilder setStackTraceDetails(LoggerStackTrace stackTrace) {
+        this.logEntryEvent.OriginLocation__c = stackTrace.originLocation;
+        this.logEntryEvent.StackTrace__c = truncateFieldValue(Schema.LogEntryEvent__e.StackTrace__c, stackTrace.parsedStackTraceString);
+        return this;
     }
 
     private void setTagsDetails() {

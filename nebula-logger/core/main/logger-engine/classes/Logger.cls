@@ -17,7 +17,6 @@ global with sharing class Logger {
     @TestVisible
     private static final String CURRENT_VERSION_NUMBER = 'v4.11.5';
     private static final System.LoggingLevel FALLBACK_LOGGING_LEVEL = System.LoggingLevel.DEBUG;
-    private static final Set<String> IGNORED_APEX_CLASSES = initializeIgnoredApexClasses();
     private static final List<LogEntryEventBuilder> LOG_ENTRIES_BUFFER = new List<LogEntryEventBuilder>();
     private static final String ORGANIZATION_DOMAIN_URL = System.URL.getOrgDomainUrl()?.toExternalForm();
     private static final String REQUEST_ID = System.Request.getCurrent().getRequestId();
@@ -100,6 +99,7 @@ global with sharing class Logger {
         // The rest of the codebase should use a method in Logger.cls
         System.debug(System.LoggingLevel.INFO, 'Nebula Logger - Version Number: ' + getVersionNumber());
         System.debug(System.LoggingLevel.INFO, 'Nebula Logger - Transaction ID: ' + getTransactionId());
+        LoggerStackTrace.ignoreOrigins(new Set<System.Type>{ Logger.class, LogEntryEventBuilder.class, LogMessage.class });
         setScenario(getUserSettings().DefaultScenario__c);
     }
 
@@ -3079,7 +3079,7 @@ global with sharing class Logger {
      * @param  apexType The Apex type of the class to ignore
      */
     global static void ignoreOrigin(System.Type apexType) {
-        IGNORED_APEX_CLASSES.add(apexType.getName());
+        LoggerStackTrace.ignoreOrigin(apexType);
     }
 
     /**
@@ -3300,7 +3300,8 @@ global with sharing class Logger {
     }
 
     private static LogEntryEventBuilder newEntry(System.LoggingLevel loggingLevel, Boolean shouldSave) {
-        LogEntryEventBuilder logEntryEventBuilder = new LogEntryEventBuilder(getUserSettings(), loggingLevel, shouldSave, IGNORED_APEX_CLASSES);
+        // TODO consider deprecating constructor parameter ignoredOrigins
+        LogEntryEventBuilder logEntryEventBuilder = new LogEntryEventBuilder(getUserSettings(), loggingLevel, shouldSave, null);
         if (logEntryEventBuilder.shouldSave() == true) {
             LogEntryEvent__e logEntryEvent = logEntryEventBuilder.getLogEntryEvent();
             logEntryEvent.ApiVersion__c = getOrganizationApiVersion();
@@ -3318,10 +3319,6 @@ global with sharing class Logger {
         }
 
         return logEntryEventBuilder;
-    }
-
-    private static Set<String> initializeIgnoredApexClasses() {
-        return new Set<String>{ Logger.class.getName(), LogEntryEventBuilder.class.getName(), LogMessage.class.getName() };
     }
 
     private static Boolean hasValidStartAndEndTimes(LoggerSettings__c settings) {

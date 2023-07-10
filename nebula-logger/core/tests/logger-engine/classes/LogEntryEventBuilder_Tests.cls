@@ -1197,127 +1197,23 @@ private class LogEntryEventBuilder_Tests {
     }
 
     @IsTest
-    static void it_should_set_stack_trace_and_origin_location_for_class_constructor_trace_string() {
+    static void it_should_use_logger_stack_trace_class_to_set_stack_trace_and_origin_location_fields() {
         // Don't bother testing stack trace logic when using a namespace prefix - there are
         // some platform limitations that prevent these tests from behaving as expected
         if (LogEntryEventBuilder.class.getName().contains('.') == true) {
             return;
         }
 
-        String qualifiedClassName = DebugStringExample.class.getName();
-        String expectedOriginLocation = qualifiedClassName + '.<init>';
         DebugStringExample constructedClass = new DebugStringExample();
-        String expectedStackTrace = constructedClass.getStackTraceString();
+        LoggerStackTrace expectedStackTrace = new LoggerStackTrace(constructedClass.getStackTraceString());
         LogEntryEventBuilder builder = new LogEntryEventBuilder(getUserSettings(), System.LoggingLevel.FINE, true, new Set<String>());
         builder.getLogEntryEvent().OriginLocation__c = null;
         builder.getLogEntryEvent().StackTrace__c = null;
 
         builder.parseStackTrace(constructedClass.getStackTraceString());
 
-        System.Assert.isNotNull(builder.getLogEntryEvent().OriginLocation__c);
-        System.Assert.areEqual(expectedOriginLocation, builder.getLogEntryEvent().OriginLocation__c);
-        System.Assert.isNotNull(builder.getLogEntryEvent().StackTrace__c);
-        System.Assert.areEqual(expectedStackTrace, builder.getLogEntryEvent().StackTrace__c);
-    }
-
-    @IsTest
-    static void it_should_set_stack_trace_and_origin_location_for_method_stack_trace_string() {
-        // Don't bother testing stack trace logic when using a namespace prefix - there are
-        // some platform limitations that prevent these tests from behaving as expected
-        if (LogEntryEventBuilder.class.getName().contains('.') == true) {
-            return;
-        }
-
-        System.DmlException stackTraceHandler = new System.DmlException();
-        String qualifiedClassName = LogEntryEventBuilder_Tests.class.getName();
-        String expectedOriginLocation = qualifiedClassName + '.it_should_set_stack_trace_and_origin_location_for_method_stack_trace_string';
-        String expectedStackTrace = stackTraceHandler.getStackTraceString();
-        LogEntryEventBuilder builder = new LogEntryEventBuilder(getUserSettings(), System.LoggingLevel.FINE, true, new Set<String>());
-        builder.getLogEntryEvent().OriginLocation__c = null;
-        builder.getLogEntryEvent().StackTrace__c = null;
-
-        builder.parseStackTrace(stackTraceHandler.getStackTraceString());
-
-        System.Assert.isNotNull(builder.getLogEntryEvent().OriginLocation__c);
-        System.Assert.areEqual(expectedOriginLocation, builder.getLogEntryEvent().OriginLocation__c);
-        System.Assert.isNotNull(builder.getLogEntryEvent().StackTrace__c);
-        System.Assert.areEqual(expectedStackTrace, builder.getLogEntryEvent().StackTrace__c);
-    }
-
-    @IsTest
-    static void it_should_ignore_stack_trace_line_when_matching_class_type_is_specified() {
-        String qualifiedClassName = LogEntryEventBuilder_Tests.class.getName();
-        String mockStackTrace =
-            'Class.' +
-            qualifiedClassName +
-            '.it_should_ignore_stack_trace_line_when_ignore_origin_location_method_is_called: line 99999, column 1' +
-            '\nClass.ExampleClassWithLogging.doSomething: line 17, column 1' +
-            '\nAnonymousBlock: line 1, column 1';
-        String expectedStackTrace = 'Class.ExampleClassWithLogging.doSomething: line 17, column 1' + '\nAnonymousBlock: line 1, column 1';
-        String expectedOriginLocation = 'ExampleClassWithLogging.doSomething';
-
-        LogEntryEventBuilder builder = new LogEntryEventBuilder(
-            getUserSettings(),
-            System.LoggingLevel.FINE,
-            true,
-            new Set<String>{ LogEntryEventBuilder_Tests.class.getName() }
-        );
-        builder.parseStackTrace(mockStackTrace);
-
-        System.Assert.isNotNull(builder.getLogEntryEvent().OriginLocation__c);
-        System.Assert.areEqual(expectedOriginLocation, builder.getLogEntryEvent().OriginLocation__c);
-        System.Assert.isNotNull(builder.getLogEntryEvent().StackTrace__c);
-        System.Assert.areEqual(expectedStackTrace, builder.getLogEntryEvent().StackTrace__c);
-    }
-
-    @IsTest
-    static void it_should_set_stack_trace_and_origin_location_for_anonymous_apex_stack_trace_string() {
-        String anonymousApexOriginLocation = 'AnonymousBlock';
-        String anonymousApexStackTraceString = 'AnonymousBlock: line 9, column 1';
-
-        LogEntryEventBuilder builder = new LogEntryEventBuilder(
-            getUserSettings(),
-            System.LoggingLevel.FINE,
-            true,
-            new Set<String>{ LogEntryEventBuilder_Tests.class.getName() }
-        );
-        builder.parseStackTrace(anonymousApexStackTraceString);
-
-        System.Assert.isNotNull(builder.getLogEntryEvent().OriginLocation__c);
-        System.Assert.areEqual(anonymousApexOriginLocation, builder.getLogEntryEvent().OriginLocation__c);
-        System.Assert.isNotNull(builder.getLogEntryEvent().StackTrace__c);
-        System.Assert.areEqual(anonymousApexStackTraceString, builder.getLogEntryEvent().StackTrace__c);
-    }
-
-    @IsTest
-    static void it_should_deduplicate_sequential_lines_when_setting_stack_trace() {
-        String anonymousApexOriginLocation = 'AnonymousBlock';
-        String deduplicatedStackTraceString = 'AnonymousBlock: line 9, column 1';
-        String duplicatedStackTraceString = deduplicatedStackTraceString + '\n' + deduplicatedStackTraceString + '\n' + deduplicatedStackTraceString;
-
-        LogEntryEventBuilder builder = new LogEntryEventBuilder(getUserSettings(), System.LoggingLevel.FINE, true, new Set<String>());
-        builder.getLogEntryEvent().OriginLocation__c = null;
-        builder.getLogEntryEvent().StackTrace__c = null;
-        builder.parseStackTrace(duplicatedStackTraceString);
-
-        System.Assert.isNotNull(builder.getLogEntryEvent().OriginLocation__c);
-        System.Assert.areEqual(anonymousApexOriginLocation, builder.getLogEntryEvent().OriginLocation__c);
-        System.Assert.isNotNull(builder.getLogEntryEvent().StackTrace__c);
-        System.Assert.areEqual(deduplicatedStackTraceString, builder.getLogEntryEvent().StackTrace__c);
-    }
-
-    @IsTest
-    static void it_should_not_set_stack_trace_and_origin_location_for_invalid_stack_trace_string() {
-        final String invalidStackTrace = '()';
-
-        LogEntryEventBuilder builder = new LogEntryEventBuilder(getUserSettings(), System.LoggingLevel.INFO, true, new Set<String>());
-        // Clear out any auto-set values
-        builder.getLogEntryEvent().OriginLocation__c = null;
-        builder.getLogEntryEvent().StackTrace__c = null;
-        builder.parseStackTrace(invalidStackTrace);
-
-        System.Assert.isNull(builder.getLogEntryEvent().OriginLocation__c);
-        System.Assert.isNull(builder.getLogEntryEvent().StackTrace__c);
+        System.Assert.areEqual(expectedStackTrace.originLocation, builder.getLogEntryEvent().OriginLocation__c);
+        System.Assert.areEqual(expectedStackTrace.parsedStackTraceString, builder.getLogEntryEvent().StackTrace__c);
     }
 
     @IsTest

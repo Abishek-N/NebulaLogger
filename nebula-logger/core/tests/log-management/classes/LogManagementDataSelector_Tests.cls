@@ -34,7 +34,7 @@ private class LogManagementDataSelector_Tests {
     static void it_returns_matching_apex_classes_for_specified_class_names() {
         List<String> targetApexClassNames = new List<String>{ Logger.class.getName(), LogEntryEventBuilder.class.getName() };
         List<ApexClass> expectedResults = [
-            SELECT ApiVersion, CreatedById, CreatedDate, Id, LastModifiedById, LastModifiedDate, Name
+            SELECT ApiVersion, Body, CreatedById, CreatedDate, Id, LastModifiedById, LastModifiedDate, Name
             FROM ApexClass
             WHERE Name IN :targetApexClassNames
             ORDER BY NamespacePrefix NULLS LAST
@@ -176,12 +176,26 @@ private class LogManagementDataSelector_Tests {
     static void it_returns_log_for_specified_log_id() {
         LoggerSObjectHandler.shouldExecute(false);
         Log__c log = (Log__c) LoggerMockDataCreator.createDataBuilder(Schema.Log__c.SObjectType).populateRequiredFields().getRecord();
-        Log__c anotherLog = (Log__c) LoggerMockDataCreator.createDataBuilder(Schema.Log__c.SObjectType).populateRequiredFields().getRecord();
+        Log__c anotherLog = (Log__c) log.clone();
         insert new List<Log__c>{ log, anotherLog };
 
         Log__c returnedLog = LogManagementDataSelector.getInstance().getLogById(log.Id);
 
         System.Assert.areEqual(log.Id, returnedLog.Id);
+    }
+
+    @IsTest
+    static void it_returns_log_entry_for_specified_log_entry_id() {
+        LoggerSObjectHandler.shouldExecute(false);
+        Log__c log = (Log__c) LoggerMockDataCreator.createDataBuilder(Schema.Log__c.SObjectType).populateRequiredFields().getRecord();
+        insert log;
+        LogEntry__c logEntry = (LogEntry__c) LoggerMockDataCreator.createDataBuilder(new LogEntry__c(Log__c = log.Id)).populateRequiredFields().getRecord();
+        LogEntry__c anotherLogEntry = logEntry.clone();
+        insert new List<LogEntry__c>{ logEntry, anotherLogEntry };
+
+        LogEntry__c returnedLogEntry = LogManagementDataSelector.getInstance().getLogEntryById(logEntry.Id);
+
+        System.Assert.areEqual(logEntry.Id, returnedLogEntry.Id);
     }
 
     @IsTest

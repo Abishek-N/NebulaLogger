@@ -6,43 +6,25 @@ public without sharing class LogEntryMetadataViewerController {
             return metadata;
         }
 
-        // TODO consolidate use selector class
-        LogEntry__c logEntry = [
-            SELECT
-                ApexClassId__c,
-                ApexClassName__c,
-                ApexClassSnippet__c,
-                ExceptionApexClassName__c,
-                ExceptionApexClassSnippet__c,
-                FlowActiveVersionId__c,
-                Id,
-                OriginType__c,
-                RecordCollectionType__c,
-                RecordJson__c,
-                Timestamp__c
-            FROM LogEntry__c
-            WHERE Id = :recordId
-        ];
+        LogEntry__c logEntry = LogManagementDataSelector.getInstance().getLogEntryById(recordId);
 
-        // TODO consolidate queries & use selector class
-        if (logEntry.ApexClassName__c != null) {
-            List<ApexClass> possibleMatches = [
-                SELECT Id, Body, LastModifiedBy.Name, LastModifiedBy.Username, LastModifiedDate
-                FROM ApexClass
-                WHERE Name = :logEntry.ApexClassName__c
-            ];
-            ApexClass matchingApexClass = possibleMatches.size() == 1 ? possibleMatches.get(0) : null;
+        if (logEntry.ApexClassName__c == null && logEntry.ExceptionApexClassName__c == null) {
+            return metadata;
+        }
+
+        List<String> apexClassNames = new List<String>{ logEntry.ApexClassName__c, logEntry.ExceptionApexClassName__c };
+        Map<String, ApexClass> apexClassNameToClass = new Map<String, ApexClass>();
+        for (ApexClass apexClass : LogManagementDataSelector.getInstance().getApexClasses(apexClassNames)) {
+            apexClassNameToClass.put(apexClass.Name, apexClass);
+        }
+
+        if (apexClassNameToClass.containsKey(logEntry.ApexClassName__c) == true) {
+            ApexClass matchingApexClass = apexClassNameToClass.get(logEntry.ApexClassName__c);
             metadata.originApexClassCode = matchingApexClass?.Body;
             metadata.hasOriginApexClassBeenModified = matchingApexClass?.LastModifiedDate > logEntry.Timestamp__c;
         }
         if (logEntry.ExceptionApexClassName__c != null) {
-            List<ApexClass> possibleMatches = [
-                SELECT Id, Body, LastModifiedBy.Name, LastModifiedBy.Username, LastModifiedDate
-                FROM ApexClass
-                WHERE Name = :logEntry.ExceptionApexClassName__c
-                LIMIT 1
-            ];
-            ApexClass matchingApexClass = possibleMatches.size() == 1 ? possibleMatches.get(0) : null;
+            ApexClass matchingApexClass = apexClassNameToClass.get(logEntry.ExceptionApexClassName__c);
             metadata.exceptionApexClassCode = matchingApexClass?.Body;
             metadata.hasExceptionApexClassBeenModified = matchingApexClass?.LastModifiedDate > logEntry.Timestamp__c;
         }

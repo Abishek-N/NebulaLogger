@@ -31,6 +31,7 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
         this.setFlowDefinitionFields();
         this.setFlowVersionFields();
         this.setRecordNames();
+        // This method should run last, in case any other methods modify fields related to the checkboxes
         this.setCheckboxFields();
     }
 
@@ -42,25 +43,23 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
         // and it conceptually feels weird for there to be scenarios where these fields could be inaccurate,
         // so keep them up to date just to be safe
         this.setCheckboxFields();
-
-        // TODO temp for testing, remove this method call
-        this.setApexLoggingClassFields();
-        this.setApexExceptionClassFields();
     }
 
     private void setApexLoggingClassFields() {
         List<String> apexClassNames = new List<String>();
         List<LogEntry__c> apexLogEntries = new List<LogEntry__c>();
         for (LogEntry__c logEntry : this.logEntries) {
-            if (logEntry.OriginType__c != 'Apex' || String.isBlank(logEntry.OriginLocation__c) == true) {
+            if (logEntry.OriginType__c != 'Apex' || String.isBlank(logEntry.StackTrace__c) == true) {
                 continue;
             }
 
-            // OriginLocation__c contains the class name + method name. Examples:
-            // MyClass.someMethod
-            // MyClass.MyInnerClass.someMethod
-            String apexClassName = logEntry.OriginLocation__c.substringBefore('.');
-            apexClassNames.add(apexClassName);
+            LoggerStackTrace stackTrace = new LoggerStackTrace(logEntry.StackTrace__c);
+            logEntry.ApexClassName__c = stackTrace.apexTopLevelClassName;
+            logEntry.ApexCodeLineNumber__c = stackTrace.apexCodeLineNumber;
+            logEntry.ApexInnerClassName__c = stackTrace.apexInnerClassName;
+            logEntry.ApexMethodName__c = stackTrace.apexMethodName;
+
+            apexClassNames.add(logEntry.ApexClassName__c);
             apexLogEntries.add(logEntry);
         }
 
@@ -78,31 +77,11 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
         }
 
         for (LogEntry__c logEntry : apexLogEntries) {
-            LoggerStackTrace stackTrace = new LoggerStackTrace(logEntry.StackTrace__c);
-            ApexClass topLevelApexClass = classNameToApexClass.get(stackTrace.apexTopLevelClassName);
-            // String topLevelApexClassName = logEntry.OriginLocation__c?.substringBefore('.');
-            // ApexClass topLevelApexClass = classNameToApexClass.get(topLevelApexClassName);
+            ApexClass topLevelApexClass = classNameToApexClass.get(logEntry.ApexClassName__c);
             if (topLevelApexClass == null) {
                 return;
             }
 
-            // TODO switch to using LoggerStackTrace here?
-
-            // String methodName = logEntry.OriginLocation__c.substringAfterLast('.');
-            // String innerApexClassName = logEntry.OriginLocation__c.substringAfter(topLevelApexClassName + '.').substringBeforeLast('.');
-            // if (innerApexClassName == topLevelApexClassName || innerApexClassName == methodName) {
-            //     innerApexClassName = null;
-            // } else if (innerApexClassName.startsWith(topLevelApexClassName + '.')) {
-            //     innerApexClassName = innerApexClassName.substringAfter(topLevelApexClassName + '.');
-            // }
-
-            // Stack trace fields
-            logEntry.ApexClassName__c = stackTrace.apexTopLevelClassName;
-            logEntry.ApexCodeLineNumber__c = stackTrace.apexCodeLineNumber;
-            logEntry.ApexInnerClassName__c = stackTrace.apexInnerClassName;
-            logEntry.ApexMethodName__c = stackTrace.apexMethodName;
-
-            // Queried ApexClass fields
             logEntry.ApexClassApiVersion__c = 'v' + topLevelApexClass.ApiVersion;
             logEntry.ApexClassCreatedDate__c = topLevelApexClass.CreatedDate;
             logEntry.ApexClassId__c = topLevelApexClass.Id;
@@ -115,7 +94,7 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
         List<String> apexClassNames = new List<String>();
         List<LogEntry__c> apexLogEntries = new List<LogEntry__c>();
         for (LogEntry__c logEntry : this.logEntries) {
-            if (logEntry.ExceptionStackTrace__c == null) {
+            if (logEntry.OriginType__c != 'Apex' || String.isBlank(logEntry.ExceptionStackTrace__c) == true) {
                 continue;
             }
 
@@ -125,7 +104,7 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
             logEntry.ExceptionApexInnerClassName__c = stackTrace.apexInnerClassName;
             logEntry.ExceptionApexMethodName__c = stackTrace.apexMethodName;
 
-            apexClassNames.add(stackTrace.apexTopLevelClassName);
+            apexClassNames.add(logEntry.ExceptionApexClassName__c);
             apexLogEntries.add(logEntry);
         }
 
@@ -143,13 +122,15 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
         }
 
         for (LogEntry__c logEntry : apexLogEntries) {
-            ApexClass topLevelApexClass = classNameToApexClass.get(logEntry.ExceptionApexClassName__c);
-            // Queried ApexClass fields
+            ApexClass topLevelApexClass = classNameToApexClass.get(logEntry.ApexClassName__c);
+            if (topLevelApexClass == null) {
+                return;
+            }
+
             logEntry.ExceptionApexClassApiVersion__c = 'v' + topLevelApexClass.ApiVersion;
             logEntry.ExceptionApexClassCreatedDate__c = topLevelApexClass.CreatedDate;
             logEntry.ExceptionApexClassId__c = topLevelApexClass.Id;
             logEntry.ExceptionApexClassLastModifiedDate__c = topLevelApexClass.LastModifiedDate;
-            logEntry.ExceptionApexClassSnippet__c = JSON.serializePretty(new ApexCodeSnippet(topLevelApexClass, Integer.valueOf(logEntry.ApexCodeLineNumber__c)));
             logEntry.ExceptionApexClassSnippet__c = JSON.serializePretty(
                 new ApexCodeSnippet(topLevelApexClass, Integer.valueOf(logEntry.ExceptionApexCodeLineNumber__c))
             );

@@ -11,7 +11,6 @@
  */
 public without sharing class LoggerStackTrace {
     private final static Set<String> IGNORED_APEX_CLASSES = new Set<String>{ LoggerStackTrace.class.getName() };
-    private final static String NAMESPACE_PREFIX = getNamespacePrefix();
     private final static String NEW_LINE_DELIMITER = '\n';
 
     public String apexTopLevelClassName { get; private set; }
@@ -21,15 +20,14 @@ public without sharing class LoggerStackTrace {
     public String originLocation { get; private set; }
     public String parsedStackTraceString { get; private set; }
 
-    private transient final String originalStackTraceString;
-
     public static void ignoreOrigin(System.Type apexType) {
         IGNORED_APEX_CLASSES.add(apexType.getName());
     }
 
-    private static String getNamespacePrefix() {
-        String className = LoggerStackTrace.class.getName();
-        return className.contains('.') ? className.substringBefore('.') : '';
+    public static void ignoreOrigins(Set<System.Type> apexTypes) {
+        for (System.Type apexType : apexTypes) {
+            IGNORED_APEX_CLASSES.add(apexType.getName());
+        }
     }
 
     public LoggerStackTrace() {
@@ -41,18 +39,16 @@ public without sharing class LoggerStackTrace {
     }
 
     public LoggerStackTrace(String apexStackTraceString) {
-        this.originalStackTraceString = apexStackTraceString;
-
-        this.setApexClassDetails();
+        this.setApexClassDetails(apexStackTraceString);
     }
 
-    private void setApexClassDetails() {
-        if (this.isValidStackTrace(this.originalStackTraceString) == false) {
+    private void setApexClassDetails(String apexStackTraceString) {
+        if (this.isValidStackTrace(apexStackTraceString) == false) {
             return;
         }
 
         // In a managed package, we can end up with an invalid (unhelpful) stack trace, so only store when valid
-        List<String> cleansedStackTraceLines = this.getCleansedStackTraceLines(this.originalStackTraceString);
+        List<String> cleansedStackTraceLines = this.getCleansedStackTraceLines(apexStackTraceString);
         this.parsedStackTraceString = String.join(cleansedStackTraceLines, NEW_LINE_DELIMITER);
         if (this.isValidStackTrace(this.parsedStackTraceString)) {
             String firstStackTraceLine = cleansedStackTraceLines.get(0);
@@ -66,16 +62,27 @@ public without sharing class LoggerStackTrace {
 
             this.originLocation = cleanedOriginLocation;
 
-            // Example: Class.ExampleClassWithLogging.throwSomeException: line 25, column 1
-            this.apexCodeLineNumber = Integer.valueOf(firstStackTraceLine.substringAfter('line ').substringBefore(','));
-            this.apexMethodName = firstStackTraceLine.substringBefore(':').substringAfterLast('.');
-            this.apexTopLevelClassName = firstStackTraceLine.substringAfter('Class.').substringBefore('.');
-            this.apexInnerClassName = firstStackTraceLine.substringAfter('Class.' + apexTopLevelClassName + '.').substringBeforeLast('.' + this.apexMethodName);
+            // Example anonymous block: AnonymousBlock: line 9, column 1
+            // Example top-level class: Class.ExampleClassWithLogging.throwSomeException: line 25, column 1
+            // Example inner class: Class.ExampleClassWithLogging.SomeInnerClass.doSomethingElse(): line 97, column 1
+            String apexCodeLineNumberString = firstStackTraceLine.substringAfter('line ').substringBefore(',');
+            if (String.isNotBlank(apexCodeLineNumberString) == true) {
+                this.apexCodeLineNumber = Integer.valueOf(apexCodeLineNumberString);
+            }
+            List<String> originLocationPieces = cleanedOriginLocation.split('\\.');
+            this.apexTopLevelClassName = originLocationPieces.get(0);
+            this.apexInnerClassName = originLocationPieces.size() == 3 ? originLocationPieces.get(1) : null;
+            this.apexMethodName = originLocationPieces.size() >= 2 ? originLocationPieces.get(originLocationPieces.size() - 1) : null;
         }
     }
 
     private Boolean isValidStackTrace(String stackTraceString) {
-        if (String.isBlank(stackTraceString) == true || stackTraceString == '()' || stackTraceString == '(' + NAMESPACE_PREFIX + ')') {
+        // Some lines, especially in the managed package, can result in '()' or '(Some_Namespace)'
+        if (
+            String.isBlank(stackTraceString) == true ||
+            stackTraceString == '()' ||
+            System.Pattern.compile('^\\([0-9A-Za-z_]+\\)$').matcher(stackTraceString).matches() == true
+        ) {
             return false;
         }
 

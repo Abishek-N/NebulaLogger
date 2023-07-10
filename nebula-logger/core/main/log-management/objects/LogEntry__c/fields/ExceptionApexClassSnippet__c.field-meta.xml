@@ -4,9 +4,8 @@
     <businessStatus>Active</businessStatus>
     <complianceGroup>None</complianceGroup>
     <externalId>false</externalId>
-    <inlineHelpText>A JSON snippet of the Apex class's code that threw the exception</inlineHelpText>
+    <inlineHelpText>A JSON snippet of the Apex class&apos;s code that threw the exception</inlineHelpText>
     <label>Exception Apex Class Snippet</label>
-    <!-- TODO finalize length needed -->
     <length>3000</length>
     <securityClassification>Confidential</securityClassification>
     <trackFeedHistory>false</trackFeedHistory>

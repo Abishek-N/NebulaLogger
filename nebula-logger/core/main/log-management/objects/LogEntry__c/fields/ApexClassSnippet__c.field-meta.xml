@@ -4,7 +4,7 @@
     <businessStatus>Active</businessStatus>
     <complianceGroup>None</complianceGroup>
     <externalId>false</externalId>
-    <inlineHelpText>A JSON snippet of the Apex class's code that generated the log entry</inlineHelpText>
+    <inlineHelpText>A JSON snippet of the Apex class&apos;s code that generated the log entry</inlineHelpText>
     <label>Apex Class Snippet</label>
     <!-- TODO finalize length needed -->
     <length>3000</length>
