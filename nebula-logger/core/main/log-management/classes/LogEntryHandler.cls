@@ -411,7 +411,7 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
             this.setCode(apexClass, allCodeLines);
         }
 
-        private void calculateLineNumbers(ApexClass apexClass, Integer numberOFCodeLines) {
+        private void calculateLineNumbers(ApexClass apexClass, Integer numberOfCodeLines) {
             // TODO consider making these values configurable with 2 new LoggerParameter__mdt records
             final Integer targetLeadingLines = 8;
             final Integer targetTrailingLines = 4;
@@ -422,8 +422,8 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
             }
 
             this.endingLineNumber = this.targetLineNumber + targetTrailingLines;
-            if (this.endingLineNumber > numberOFCodeLines) {
-                this.endingLineNumber = numberOFCodeLines;
+            if (this.endingLineNumber > numberOfCodeLines) {
+                this.endingLineNumber = numberOfCodeLines;
             }
         }
 

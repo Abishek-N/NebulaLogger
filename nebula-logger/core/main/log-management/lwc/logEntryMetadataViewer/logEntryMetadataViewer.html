@@ -1,25 +1,26 @@
 <template>
     <template if:true={hasLoaded}>
         <!-- Origin Details -->
-        <c-logger-page-section title={sectionTitleOriginDetails}>
+        <c-logger-page-section data-id="origin-details" title={sectionTitleOriginDetails}>
             <span slot="content">
                 <lightning-layout multiple-rows vertical-align="start">
                     <lightning-layout-item size="12">
                         <lightning-record-view-form record-id={recordId} object-api-name={objectApiName}>
-                            <lightning-output-field class="slds-form-element_readonly" field-name="Message__c"></lightning-output-field>
+                            <lightning-output-field class="slds-form-element_readonly" data-id="Message__c" field-name="Message__c"></lightning-output-field>
                             <template if:true={showMessageMaskedField}>
-                                <lightning-output-field class="slds-form-element_readonly" field-name="MessageMasked__c"></lightning-output-field>
+                                <lightning-output-field class="slds-form-element_readonly" data-id="MessageMasked__c" field-name="MessageMasked__c"></lightning-output-field>
                             </template>
                             <template if:true={showMessageTruncatedField}>
-                                <lightning-output-field class="slds-form-element_readonly" field-name="MessageTruncated__c"></lightning-output-field>
+                                <lightning-output-field class="slds-form-element_readonly" data-id="MessageTruncated__c" field-name="MessageTruncated__c"></lightning-output-field>
                             </template>
-                            <lightning-output-field class="slds-form-element_readonly" field-name="StackTrace__c"></lightning-output-field>
+                            <lightning-output-field class="slds-form-element_readonly" data-id="StackTrace__c" field-name="StackTrace__c"></lightning-output-field>
                         </lightning-record-view-form>
                     </lightning-layout-item>
                     <template if:true={originApexCodeSnippet}>
                         <lightning-layout-item size="12">
                             <c-logger-code-viewer
                                 code={originApexCodeSnippet.code}
+                                data-id="originApexCodeSnippet"
                                 language={originApexCodeSnippet.language}
                                 starting-line-number={originApexCodeSnippet.startingLineNumber}
                                 target-line-number={originApexCodeSnippet.targetLineNumber}
@@ -45,20 +46,21 @@
 
         <!-- Exception Details -->
         <template if:true={showExceptionDetails}>
-            <c-logger-page-section title={sectionTitleExceptionDetails}>
+            <c-logger-page-section data-id="exception-details" title={sectionTitleExceptionDetails}>
                 <span slot="content">
                     <lightning-layout multiple-rows vertical-align="start">
                         <lightning-layout-item size="12">
                             <lightning-record-view-form record-id={recordId} object-api-name={objectApiName}>
-                                <lightning-output-field class="slds-form-element_readonly" field-name="ExceptionType__c"></lightning-output-field>
-                                <lightning-output-field class="slds-form-element_readonly" field-name="ExceptionMessage__c"></lightning-output-field>
-                                <lightning-output-field class="slds-form-element_readonly" field-name="ExceptionStackTrace__c"></lightning-output-field>
+                                <lightning-output-field class="slds-form-element_readonly" data-id="ExceptionType__c" field-name="ExceptionType__c"></lightning-output-field>
+                                <lightning-output-field class="slds-form-element_readonly" data-id="ExceptionMessage__c" field-name="ExceptionMessage__c"></lightning-output-field>
+                                <lightning-output-field class="slds-form-element_readonly" data-id="ExceptionStackTrace__c" field-name="ExceptionStackTrace__c"></lightning-output-field>
                             </lightning-record-view-form>
                         </lightning-layout-item>
                         <template if:true={exceptionApexCodeSnippet}>
                             <lightning-layout-item size="12">
                                 <c-logger-code-viewer
                                     code={exceptionApexCodeSnippet.code}
+                                    data-id="exceptionApexCodeSnippet"
                                     language={exceptionApexCodeSnippet.language}
                                     starting-line-number={exceptionApexCodeSnippet.startingLineNumber}
                                     target-line-number={exceptionApexCodeSnippet.targetLineNumber}

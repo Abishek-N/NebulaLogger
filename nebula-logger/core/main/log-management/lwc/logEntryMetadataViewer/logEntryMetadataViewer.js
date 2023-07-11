@@ -6,21 +6,19 @@ import LOG_ENTRY_OBJECT from '@salesforce/schema/LogEntry__c';
 import EXCEPTION_APEX_CLASS_NAME_FIELD from '@salesforce/schema/LogEntry__c.ExceptionApexClassName__c';
 import EXCEPTION_APEX_CLASS_SNIPPET_FIELD from '@salesforce/schema/LogEntry__c.ExceptionApexClassSnippet__c';
 import EXCEPTION_TYPE_FIELD from '@salesforce/schema/LogEntry__c.ExceptionType__c';
-import FLOW_ACTIVE_VERSION_ID_FIELD from '@salesforce/schema/LogEntry__c.FlowActiveVersionId__c';
-import LOGGING_APEX_CLASS_NAME_FIELD from '@salesforce/schema/LogEntry__c.ApexClassName__c';
-import LOGGING_APEX_CLASS_SNIPPET_FIELD from '@salesforce/schema/LogEntry__c.ApexClassSnippet__c';
 import MESSAGE_MASKED_FIELD from '@salesforce/schema/LogEntry__c.MessageMasked__c';
 import MESSAGE_TRUNCATED_FIELD from '@salesforce/schema/LogEntry__c.MessageTruncated__c';
+import ORIGIN_APEX_CLASS_NAME_FIELD from '@salesforce/schema/LogEntry__c.ApexClassName__c';
+import ORIGIN_APEX_CLASS_SNIPPET_FIELD from '@salesforce/schema/LogEntry__c.ApexClassSnippet__c';
 
 const LOG_ENTRY_FIELDS = [
     EXCEPTION_APEX_CLASS_NAME_FIELD,
     EXCEPTION_APEX_CLASS_SNIPPET_FIELD,
     EXCEPTION_TYPE_FIELD,
-    FLOW_ACTIVE_VERSION_ID_FIELD,
-    LOGGING_APEX_CLASS_NAME_FIELD,
-    LOGGING_APEX_CLASS_SNIPPET_FIELD,
     MESSAGE_MASKED_FIELD,
-    MESSAGE_TRUNCATED_FIELD
+    MESSAGE_TRUNCATED_FIELD,
+    ORIGIN_APEX_CLASS_NAME_FIELD,
+    ORIGIN_APEX_CLASS_SNIPPET_FIELD
 ];
 
 export default class LogEntryMetadataViewer extends LightningElement {
@@ -68,7 +66,7 @@ export default class LogEntryMetadataViewer extends LightningElement {
     @wire(getMetadata, {
         recordId: '$recordId'
     })
-    wiredLogEntryMetadata({ error, data }) {
+    wiredGetLogEntryMetadata({ error, data }) {
         if (data) {
             this._logEntryMetadata = data;
             this._logEntryExceptionApexClassCode = data.exceptionApexClassCode;
@@ -84,12 +82,12 @@ export default class LogEntryMetadataViewer extends LightningElement {
         recordId: '$recordId',
         fields: LOG_ENTRY_FIELDS
     })
-    wiredLogEntry({ error, data }) {
+    wiredGetLogEntry({ error, data }) {
         if (data) {
             this._logEntry = data;
-            const originApexCodeSnippetValue = getFieldValue(this._logEntry, LOGGING_APEX_CLASS_SNIPPET_FIELD);
+            const originApexCodeSnippetValue = getFieldValue(this._logEntry, ORIGIN_APEX_CLASS_SNIPPET_FIELD);
             if (originApexCodeSnippetValue) {
-                const apexClassName = getFieldValue(this._logEntry, LOGGING_APEX_CLASS_NAME_FIELD) + '.cls';
+                const apexClassName = getFieldValue(this._logEntry, ORIGIN_APEX_CLASS_NAME_FIELD) + '.cls';
                 this.originApexCodeSnippet = { ...JSON.parse(originApexCodeSnippetValue), ...{ language: 'apex', title: apexClassName } };
             }
 

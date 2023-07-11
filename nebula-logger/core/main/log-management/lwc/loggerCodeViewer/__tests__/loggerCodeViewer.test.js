@@ -6,12 +6,14 @@ jest.mock(
     () => {
         return {
             loadScript() {
-                return new Promise((resolve, reject) => {
-                        resolve();
+                return new Promise((resolve, _) => {
+                    global.Prism = require('../../../staticresources/LoggerResources/prism.js');
+                    resolve();
                 });
             },
             loadStyle() {
-                return new Promise((resolve, reject) => {
+                return new Promise((resolve, _) => {
+                    // No-op for now
                     resolve();
                 });
             }

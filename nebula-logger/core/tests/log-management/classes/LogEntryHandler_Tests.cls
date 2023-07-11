@@ -461,17 +461,19 @@ private class LogEntryHandler_Tests {
             return;
         }
 
-        String exampleTopLevelClassName = 'Logger';
-        String methodName = 'saveLog';
-        String exampleTopLevelClassMethodName = exampleTopLevelClassName + '. ' + methodName;
+        String exampleTopLevelClassName = LogEntryHandler_Tests.class.getName();
+        String methodName = 'getApexClasses';
+        Integer targetCodeLineNumber = 100; // arbitrary line number
+        String exampleTopLevelClassMethodName = exampleTopLevelClassName + '.' + methodName;
+        String mockStackTrace = 'Class.' + exampleTopLevelClassMethodName + ': line ' + targetCodeLineNumber + ', column 1';
         ApexClass apexClass = [
-            SELECT Id, ApiVersion, CreatedDate, LastModifiedDate
+            SELECT Id, ApiVersion, Body, CreatedDate, LastModifiedDate
             FROM ApexClass
             WHERE NamespacePrefix = :getNamespacePrefix() AND Name = :exampleTopLevelClassName
         ];
         Log__c log = [SELECT Id FROM Log__c LIMIT 1];
-        LogEntry__c logEntry = new LogEntry__c(Log__c = log.Id, OriginLocation__c = exampleTopLevelClassMethodName, OriginType__c = 'Apex');
-        LoggerMockDataCreator.createDataBuilder(logEntry).populateRequiredFields().getRecord();
+        LogEntry__c logEntry = new LogEntry__c(Log__c = log.Id, OriginLocation__c = exampleTopLevelClassMethodName, OriginType__c = 'Apex', StackTrace__c = mockStackTrace);
+        LoggerMockDataCreator.createDataBuilder(logEntry).populateRequiredFields();
 
         LoggerDataStore.getDatabase().insertRecord(logEntry);
 
@@ -505,6 +507,20 @@ private class LogEntryHandler_Tests {
         System.Assert.isNull(logEntry.ApexInnerClassName__c);
         System.Assert.areEqual(methodName, logEntry.ApexMethodName__c);
         LogEntryHandler.ApexCodeSnippet expectedCodeSnippet = new LogEntryHandler.ApexCodeSnippet(apexClass, Integer.valueOf(logEntry.ApexCodeLineNumber__c));
+        Integer targetLeadingLines = 8;
+        Integer targetTrailingLines = 4;
+        List<String> codeLines = apexClass.Body.split('\n');
+        String expectedCodeSnippetString = '';
+        Integer startingLineNumberIndex = (targetCodeLineNumber - targetLeadingLines) - 1;
+        Integer endingLineNumberIndex = (targetCodeLineNumber + targetTrailingLines) - 1;
+        for (Integer i = startingLineNumberIndex; i <= endingLineNumberIndex; i++) {
+            String delimiter = String.isNotBlank(expectedCodeSnippetString) == true ? '\n' : '';
+            expectedCodeSnippetString += delimiter + codeLines.get(i);
+        }
+        System.Assert.areEqual(expectedCodeSnippetString, expectedCodeSnippet.code);
+        System.Assert.areEqual(targetCodeLineNumber - 8, expectedCodeSnippet.startingLineNumber);
+        System.Assert.areEqual(targetCodeLineNumber + 4, expectedCodeSnippet.endingLineNumber);
+        System.Assert.areEqual(targetCodeLineNumber, expectedCodeSnippet.targetLineNumber);
         System.Assert.areEqual(JSON.serializePretty(expectedCodeSnippet), logEntry.ApexClassSnippet__c);
     }
 
@@ -568,9 +584,11 @@ private class LogEntryHandler_Tests {
         Integer targetTrailingLines = 4;
         List<String> codeLines = apexClass.Body.split('\n');
         String expectedCodeSnippetString = '';
-        for (Integer i = (targetCodeLineNumber - targetLeadingLines); i < (targetCodeLineNumber + targetTrailingLines); i++) {
+        Integer startingLineNumberIndex = (targetCodeLineNumber - targetLeadingLines) - 1;
+        Integer endingLineNumberIndex = (targetCodeLineNumber + targetTrailingLines) - 1;
+        for (Integer i = startingLineNumberIndex; i <= endingLineNumberIndex; i++) {
             String delimiter = String.isNotBlank(expectedCodeSnippetString) == true ? '\n' : '';
-            expectedCodeSnippetString += delimiter + codeLines.get(i - 1);
+            expectedCodeSnippetString += delimiter + codeLines.get(i);
         }
         System.Assert.areEqual(expectedCodeSnippetString, expectedCodeSnippet.code);
         System.Assert.areEqual(targetCodeLineNumber - 8, expectedCodeSnippet.startingLineNumber);
