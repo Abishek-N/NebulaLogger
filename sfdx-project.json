@@ -13,9 +13,9 @@
             "package": "Nebula Logger - Core",
             "path": "./nebula-logger/core",
             "definitionFile": "./config/scratch-orgs/base-scratch-def.json",
-            "versionNumber": "4.11.5.NEXT",
-            "versionName": "Custom Index for Log Retention Date",
-            "versionDescription": "Added a custom index to Log__c.LogRetentionDate__c to help speed up the job LogBatchPurger in orgs with large data volumes (LDV)",
+            "versionNumber": "4.11.7.NEXT",
+            "versionName": "Observability Enhancements for Apex Logging",
+            "versionDescription": "Added automatic capturing of snippets of the origin & exception Apex classes for each LogEntry__c. The code snippet is now displayed using Prism JS on the LogEntry__c page.",
             "releaseNotesUrl": "https://github.com/jongpie/NebulaLogger/releases",
             "unpackagedMetadata": {
                 "path": "./nebula-logger/extra-tests"
