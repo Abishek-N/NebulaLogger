@@ -20,7 +20,7 @@ public with sharing class ExampleClassWithLogging {
         try {
             new ExampleInnerClass().doAnInnerSomething();
             new AnotherClassWithLogging().throwSomeException();
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             Logger.error('some error, oh no!', ex);
             Logger.saveLog();
             throw ex;

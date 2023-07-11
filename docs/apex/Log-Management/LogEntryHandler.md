@@ -8,7 +8,21 @@ Manages setting fields on `LogEntry__c` before insert &amp; before update
 
 ---
 
+### Properties
+
+#### `code` → `String`
+
+#### `endingLineNumber` → `Integer`
+
+#### `startingLineNumber` → `Integer`
+
+#### `targetLineNumber` → `Integer`
+
+---
+
 ### Methods
+
+#### `ApexCodeSnippet(ApexClass apexClass, Integer targetLineNumber)` → `public`
 
 #### `getSObjectType()` → `Schema.SObjectType`
 

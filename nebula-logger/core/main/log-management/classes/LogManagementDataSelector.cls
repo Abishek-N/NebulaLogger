@@ -199,8 +199,8 @@ public without sharing virtual class LogManagementDataSelector {
      * @param  logEntryId The `ID` of the `LogEntry__c` record to query
      * @return            The matching `LogEntry__c` record
      */
-    public virtual LogEntry__c getLogEntryById(Id logId) {
-        String queryTemplate = 'SELECT {0} FROM {1} WHERE Id = :logId';
+    public virtual LogEntry__c getLogEntryById(Id logEntryId) {
+        String queryTemplate = 'SELECT {0} FROM {1} WHERE Id = :logEntryId';
 
         List<String> logEntryFieldNames = new List<String>(Schema.LogEntry__c.SObjectType.getDescribe().fields.getMap().keySet());
         List<String> textReplacements = new List<String>{ String.join(logEntryFieldNames, ','), Schema.LogEntry__c.SObjectType.getDescribe().getName() };

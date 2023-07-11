@@ -109,6 +109,6 @@ describe('c-log-entry-metadata-viewer', () => {
         expect(exceptionCodeViewer.code).toBe(expectedCodeSnippet.code);
     });
 
-    test.todo('displays full origin Apex class in modal when "View Apex Class" button is clicked')
-    test.todo('displays full exception Apex class in modal when "View Apex Class" button is clicked')
+    test.todo('displays full origin Apex class in modal when "View Apex Class" button is clicked');
+    test.todo('displays full exception Apex class in modal when "View Apex Class" button is clicked');
 });

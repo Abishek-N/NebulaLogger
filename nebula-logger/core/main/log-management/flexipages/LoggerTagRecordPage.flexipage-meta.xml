@@ -65,16 +65,6 @@
                 <identifier>RecordOwnerIdField</identifier>
             </fieldInstance>
         </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.IconName__c</fieldItem>
-                <identifier>RecordIconName_cField</identifier>
-            </fieldInstance>
-        </itemInstances>
         <name>Facet-5ed917a2-57e4-43fa-89eb-76c78e264b65</name>
         <type>Facet</type>
     </flexiPageRegions>

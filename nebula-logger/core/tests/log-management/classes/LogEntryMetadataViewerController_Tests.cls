@@ -71,7 +71,6 @@ private class LogEntryMetadataViewerController_Tests {
         System.Assert.areEqual(originApexClass.Body, logEntryMetadata.originApexClassCode);
     }
 
-
     @IsTest
     static void it_indicates_when_origin_class_has_been_modified_after_log_entry_timestamp() {
         // The specific ApexClass used here doesn't really matter, but since LogEntryMetadataViewerController

@@ -472,7 +472,12 @@ private class LogEntryHandler_Tests {
             WHERE NamespacePrefix = :getNamespacePrefix() AND Name = :exampleTopLevelClassName
         ];
         Log__c log = [SELECT Id FROM Log__c LIMIT 1];
-        LogEntry__c logEntry = new LogEntry__c(Log__c = log.Id, OriginLocation__c = exampleTopLevelClassMethodName, OriginType__c = 'Apex', StackTrace__c = mockStackTrace);
+        LogEntry__c logEntry = new LogEntry__c(
+            Log__c = log.Id,
+            OriginLocation__c = exampleTopLevelClassMethodName,
+            OriginType__c = 'Apex',
+            StackTrace__c = mockStackTrace
+        );
         LoggerMockDataCreator.createDataBuilder(logEntry).populateRequiredFields();
 
         LoggerDataStore.getDatabase().insertRecord(logEntry);
@@ -545,7 +550,12 @@ private class LogEntryHandler_Tests {
             WHERE NamespacePrefix = :getNamespacePrefix() AND Name = :exampleTopLevelClassName
         ];
         Log__c log = [SELECT Id FROM Log__c LIMIT 1];
-        LogEntry__c logEntry = new LogEntry__c(Log__c = log.Id, OriginLocation__c = exampleInnerClassMethodName, OriginType__c = 'Apex', StackTrace__c = mockStackTrace);
+        LogEntry__c logEntry = new LogEntry__c(
+            Log__c = log.Id,
+            OriginLocation__c = exampleInnerClassMethodName,
+            OriginType__c = 'Apex',
+            StackTrace__c = mockStackTrace
+        );
         LoggerMockDataCreator.createDataBuilder(logEntry).populateRequiredFields();
 
         LoggerDataStore.getDatabase().insertRecord(logEntry);

@@ -6,16 +6,13 @@ private class LoggerStackTrace_Tests {
         String topLevelClassName = LoggerStackTrace_Tests.class.getName();
         String methodName = 'it_should_set_details_for_parameterless_constructor';
         String expectedOriginLocation = topLevelClassName + '.' + methodName;
-        System.DmlException stackTraceGenerator = new System.DmlException();
-        stackTraceGenerator.getLineNumber();
-        String expectedStackTraceString = stackTraceGenerator.getStackTraceString();
+        Integer expectedSourceLineNumber = 11; // Manually-maintained value for the line number below where parameterlessStackTrace is initialized
 
         LoggerStackTrace parameterlessStackTrace = new LoggerStackTrace();
 
         System.Assert.areEqual(topLevelClassName, parameterlessStackTrace.apexTopLevelClassName);
         System.Assert.isNull(parameterlessStackTrace.apexInnerClassName);
-        Integer sourceLineNumber = 13; // Manually-maintained value for the line number above where parameterlessStackTrace is initialized
-        System.Assert.areEqual(sourceLineNumber, parameterlessStackTrace.apexCodeLineNumber);
+        System.Assert.areEqual(expectedSourceLineNumber, parameterlessStackTrace.apexCodeLineNumber);
         System.Assert.areEqual(methodName, parameterlessStackTrace.apexMethodName);
         System.Assert.areEqual(expectedOriginLocation, parameterlessStackTrace.originLocation);
         System.Assert.isTrue(parameterlessStackTrace.parsedStackTraceString.startsWith('Class.' + expectedOriginLocation));
@@ -90,13 +87,19 @@ private class LoggerStackTrace_Tests {
     @IsTest
     static void it_should_ignore_stack_trace_line_when_matching_class_type_has_been_ignored() {
         String ignoredTopLevelClassName = LoggerStackTrace_Tests.class.getName();
-        String ignoredMethodName = 'it_should_ignore_stack_trace_line_when_matching_class_type_is_specified';
-        String ignoredStackTraceLine = 'Class.' + ignoredTopLevelClassName + '.it_should_ignore_stack_trace_line_when_ignore_origin_location_method_is_called: line 99999, column 1';
+        String ignoredMethodName = 'it_should_ignore_stack_trace_line_when_matching_class_type_has_been_ignored';
+        String ignoredStackTraceLine = 'Class.' + ignoredTopLevelClassName + ignoredMethodName + ': line 99999, column 1';
         String nonIgnoredTopLevelClassName = 'TheNextClassNameInTheStack';
         Integer nonIgnoredTopLevelClassLineNumber = 987;
         String nonIgnoredMethodName = 'doSomething';
         String expectedOriginLocation = nonIgnoredTopLevelClassName + '.' + nonIgnoredMethodName;
-        String relevantStackTraceLines = 'Class.' + expectedOriginLocation + ': line ' + nonIgnoredTopLevelClassLineNumber + ', column 1' + '\nAnonymousBlock: line 1, column 1';
+        String relevantStackTraceLines =
+            'Class.' +
+            expectedOriginLocation +
+            ': line ' +
+            nonIgnoredTopLevelClassLineNumber +
+            ', column 1' +
+            '\nAnonymousBlock: line 1, column 1';
         String mockStackTrace = ignoredStackTraceLine + '\n' + relevantStackTraceLines;
 
         LoggerStackTrace.ignoreOrigin(LoggerStackTrace_Tests.class);

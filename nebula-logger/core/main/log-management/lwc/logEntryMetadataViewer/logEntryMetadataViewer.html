@@ -1,3 +1,8 @@
+<!--**********************************************************************************************
+ * This file is part of the Nebula Logger project, released under the MIT License.               *
+ * See LICENSE file or go to https://github.com/jongpie/NebulaLogger for full license details.   *
+ **********************************************************************************************-->
+
 <template>
     <template if:true={hasLoaded}>
         <!-- Origin Details -->
@@ -8,12 +13,24 @@
                         <lightning-record-view-form record-id={recordId} object-api-name={objectApiName}>
                             <lightning-output-field class="slds-form-element_readonly" data-id="Message__c" field-name="Message__c"></lightning-output-field>
                             <template if:true={showMessageMaskedField}>
-                                <lightning-output-field class="slds-form-element_readonly" data-id="MessageMasked__c" field-name="MessageMasked__c"></lightning-output-field>
+                                <lightning-output-field
+                                    class="slds-form-element_readonly"
+                                    data-id="MessageMasked__c"
+                                    field-name="MessageMasked__c"
+                                ></lightning-output-field>
                             </template>
                             <template if:true={showMessageTruncatedField}>
-                                <lightning-output-field class="slds-form-element_readonly" data-id="MessageTruncated__c" field-name="MessageTruncated__c"></lightning-output-field>
+                                <lightning-output-field
+                                    class="slds-form-element_readonly"
+                                    data-id="MessageTruncated__c"
+                                    field-name="MessageTruncated__c"
+                                ></lightning-output-field>
                             </template>
-                            <lightning-output-field class="slds-form-element_readonly" data-id="StackTrace__c" field-name="StackTrace__c"></lightning-output-field>
+                            <lightning-output-field
+                                class="slds-form-element_readonly"
+                                data-id="StackTrace__c"
+                                field-name="StackTrace__c"
+                            ></lightning-output-field>
                         </lightning-record-view-form>
                     </lightning-layout-item>
                     <template if:true={originApexCodeSnippet}>
@@ -51,9 +68,21 @@
                     <lightning-layout multiple-rows vertical-align="start">
                         <lightning-layout-item size="12">
                             <lightning-record-view-form record-id={recordId} object-api-name={objectApiName}>
-                                <lightning-output-field class="slds-form-element_readonly" data-id="ExceptionType__c" field-name="ExceptionType__c"></lightning-output-field>
-                                <lightning-output-field class="slds-form-element_readonly" data-id="ExceptionMessage__c" field-name="ExceptionMessage__c"></lightning-output-field>
-                                <lightning-output-field class="slds-form-element_readonly" data-id="ExceptionStackTrace__c" field-name="ExceptionStackTrace__c"></lightning-output-field>
+                                <lightning-output-field
+                                    class="slds-form-element_readonly"
+                                    data-id="ExceptionType__c"
+                                    field-name="ExceptionType__c"
+                                ></lightning-output-field>
+                                <lightning-output-field
+                                    class="slds-form-element_readonly"
+                                    data-id="ExceptionMessage__c"
+                                    field-name="ExceptionMessage__c"
+                                ></lightning-output-field>
+                                <lightning-output-field
+                                    class="slds-form-element_readonly"
+                                    data-id="ExceptionStackTrace__c"
+                                    field-name="ExceptionStackTrace__c"
+                                ></lightning-output-field>
                             </lightning-record-view-form>
                         </lightning-layout-item>
                         <template if:true={exceptionApexCodeSnippet}>

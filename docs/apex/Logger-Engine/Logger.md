@@ -3566,7 +3566,7 @@ String - The parent log&apos;s transaction ID. This must be explicitly set by ca
 
 #### `getSaveMethod()` → `SaveMethod`
 
-Returns the default save method used when calling saveLog() - set via LoggerSettings\_\_c or by calling setSaveMethod(SaveMethod saveMethod)
+Returns the default save method used when calling `saveLog()` - set via `LoggerSettings__c` or by calling `setSaveMethod(SaveMethod saveMethod)`
 
 ##### Return
 
@@ -3576,7 +3576,7 @@ SaveMethod
 
 **Description**
 
-The enum value of Logger.SaveMethod to use for any calls to saveLog() in the current transaction
+The enum value of Logger.SaveMethod to use for any calls to `saveLog()` in the current transaction
 
 #### `getScenario()` → `String`
 
@@ -3670,7 +3670,7 @@ The current version number, in the format `v0.0.0`
 
 #### `ignoreOrigin(System.Type apexType)` → `void`
 
-Adds the specified Apex type to the list of ignored origin locations for the current transaction. Any ignored types will be removed from the StackTrace\_\_c field, and will be skipped when determining the log entry&apos;s origin location
+Adds the specified Apex type to the list of ignored origin locations for the current transaction. Any ignored types will be removed from the `StackTrace__c` field, and will be skipped when determining the log entry&apos;s origin location
 
 ##### Parameters
 
@@ -4862,13 +4862,13 @@ Relates the current transaction&apos;s log to a parent log via the field Log**c.
 
 #### `setSaveMethod(SaveMethod saveMethod)` → `void`
 
-Sets the default save method used when calling saveLog() - any subsequent calls to saveLog() will use the specified save method
+Sets the default save method used when calling `saveLog()` - any subsequent calls to `saveLog()` will use the specified save method
 
 ##### Parameters
 
-| Param        | Description                                                                                            |
-| ------------ | ------------------------------------------------------------------------------------------------------ |
-| `saveMethod` | The enum value of Logger.SaveMethod to use for any other calls to saveLog() in the current transaction |
+| Param        | Description                                                                                                |
+| ------------ | ---------------------------------------------------------------------------------------------------------- |
+| `saveMethod` | The enum value of `Logger.SaveMethod` to use for any other calls to `saveLog()` in the current transaction |
 
 #### `setScenario(String scenario)` → `void`
 

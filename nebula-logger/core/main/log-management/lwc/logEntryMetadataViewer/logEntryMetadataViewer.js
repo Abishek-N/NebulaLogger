@@ -1,3 +1,8 @@
+/*************************************************************************************************
+ * This file is part of the Nebula Logger project, released under the MIT License.               *
+ * See LICENSE file or go to https://github.com/jongpie/NebulaLogger for full license details.   *
+ ************************************************************************************************/
+
 import { LightningElement, api, wire } from 'lwc';
 import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
 import getMetadata from '@salesforce/apex/LogEntryMetadataViewerController.getMetadata';
@@ -82,7 +87,7 @@ export default class LogEntryMetadataViewer extends LightningElement {
         recordId: '$recordId',
         fields: LOG_ENTRY_FIELDS
     })
-    wiredGetLogEntry({ error, data }) {
+    wiredGetLogEntry({ data }) {
         if (data) {
             this._logEntry = data;
             const originApexCodeSnippetValue = getFieldValue(this._logEntry, ORIGIN_APEX_CLASS_SNIPPET_FIELD);
@@ -98,9 +103,6 @@ export default class LogEntryMetadataViewer extends LightningElement {
                     this.exceptionApexCodeSnippet = { ...JSON.parse(exceptionApexCodeSnippetValue), ...{ language: 'apex', title: apexClassName } };
                 }
             }
-        } else if (error) {
-            this.originApexCodeSnippet = undefined;
-            this.exceptionApexCodeSnippet = undefined;
         }
     }
 

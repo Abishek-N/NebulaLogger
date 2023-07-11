@@ -3074,7 +3074,7 @@ global with sharing class Logger {
 
     /**
      * @description Adds the specified Apex type to the list of ignored origin locations for the current transaction.
-     *              Any ignored types will be removed from the StackTrace__c field, and will be skipped when determining
+     *              Any ignored types will be removed from the `StackTrace__c` field, and will be skipped when determining
      *              the log entry's origin location
      * @param  apexType The Apex type of the class to ignore
      */
@@ -3083,16 +3083,16 @@ global with sharing class Logger {
     }
 
     /**
-     * @description Returns the default save method used when calling saveLog() - set via LoggerSettings__c or by calling setSaveMethod(SaveMethod saveMethod)
-     * @return   The enum value of Logger.SaveMethod to use for any calls to saveLog() in the current transaction
+     * @description Returns the default save method used when calling `saveLog()` - set via `LoggerSettings__c` or by calling `setSaveMethod(SaveMethod saveMethod)`
+     * @return   The enum value of Logger.SaveMethod to use for any calls to `saveLog()` in the current transaction
      */
     global static SaveMethod getSaveMethod() {
         return getSaveMethod(transactionSaveMethodName);
     }
 
     /**
-     * @description Sets the default save method used when calling saveLog() - any subsequent calls to saveLog() will use the specified save method
-     * @param  saveMethod The enum value of Logger.SaveMethod to use for any other calls to saveLog() in the current transaction
+     * @description Sets the default save method used when calling `saveLog()` - any subsequent calls to `saveLog()` will use the specified save method
+     * @param  saveMethod The enum value of `Logger.SaveMethod` to use for any other calls to `saveLog()` in the current transaction
      */
     global static void setSaveMethod(SaveMethod saveMethod) {
         setSaveMethod(saveMethod.name());

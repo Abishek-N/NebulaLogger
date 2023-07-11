@@ -51,7 +51,7 @@ describe('c-logger-page-section', () => {
             if (isContentExpectedToBeDisplayed) {
                 expect(toggleIcon.iconName).toBe('utility:chevrondown');
                 expect(contentSlot).toBeTruthy();
-            } else{
+            } else {
                 expect(toggleIcon.iconName).toBe('utility:chevronright');
                 expect(contentSlot).toBeFalsy();
             }

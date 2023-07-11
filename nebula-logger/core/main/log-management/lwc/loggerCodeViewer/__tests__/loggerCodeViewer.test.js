@@ -30,7 +30,7 @@ describe('c-logger-code-viewer', () => {
         jest.clearAllMocks();
     });
 
-    it('displays Prism code viewer with provided attributes', async() => {
+    it('displays Prism code viewer with provided attributes', async () => {
         const element = createElement('c-logger-code-viewer', {
             is: LoggerCodeViewer
         });
