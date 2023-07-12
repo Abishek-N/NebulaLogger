@@ -76,7 +76,7 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
         for (LogEntry__c logEntry : apexLogEntries) {
             ApexClass topLevelApexClass = classNameToApexClass.get(logEntry.ApexClassName__c);
             if (topLevelApexClass == null) {
-                return;
+                continue;
             }
 
             logEntry.ApexClassApiVersion__c = 'v' + topLevelApexClass.ApiVersion;
@@ -121,7 +121,7 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
         for (LogEntry__c logEntry : apexLogEntries) {
             ApexClass topLevelApexClass = classNameToApexClass.get(logEntry.ExceptionApexClassName__c);
             if (topLevelApexClass == null) {
-                return;
+                continue;
             }
 
             logEntry.ExceptionApexClassApiVersion__c = 'v' + topLevelApexClass.ApiVersion;

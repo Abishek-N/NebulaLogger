@@ -34,8 +34,8 @@ export default class LogEntryMetadataViewer extends LightningElement {
     modalApexCodeSnippet;
 
     objectApiName = LOG_ENTRY_OBJECT;
-    sectionTitleExceptionDetails = 'Exception Details';
-    sectionTitleOriginDetails = 'Message Details';
+    sectionTitleExceptionDetails = 'Exception';
+    sectionTitleOriginDetails = 'Message';
     showModal = false;
     showModalWarning = false;
 
