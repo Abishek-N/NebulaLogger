@@ -129,7 +129,7 @@ public without sharing class LoggerEmailSender {
             if (LoggerParameter.ENABLE_SYSTEM_MESSAGES == false) {
                 return;
             } else if (emailResults.get(0).success == true) {
-                Logger.info('Logger - The email was sent successfully');
+                Logger.info('Logger - The email was sent successfully to ' + message.getToAddresses());
             } else {
                 Logger.warn('Logger - The email failed to send: ' + emailResults.get(0).errors.get(0).message);
             }

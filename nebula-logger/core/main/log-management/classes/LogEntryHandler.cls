@@ -11,9 +11,6 @@
 public without sharing class LogEntryHandler extends LoggerSObjectHandler {
     private static final Map<Schema.SObjectType, String> SOBJECT_TYPE_TO_DISPLAY_FIELD_NAME = new Map<Schema.SObjectType, String>();
 
-    @TestVisible
-    private List<LogEntry__c> logEntries;
-
     /**
      * @description Returns SObject Type that the handler is responsible for processing
      * @return      The instance of `SObjectType`
@@ -23,32 +20,32 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
     }
 
     protected override void executeBeforeInsert(List<SObject> triggerNew) {
-        this.logEntries = (List<LogEntry__c>) triggerNew;
+        List<LogEntry__c> logEntries = (List<LogEntry__c>) triggerNew;
 
-        this.setApexLoggingClassFields();
-        this.setApexExceptionClassFields();
-        this.setComponentFields();
-        this.setFlowDefinitionFields();
-        this.setFlowVersionFields();
-        this.setRecordNames();
+        this.setApexOriginClassFields(logEntries);
+        this.setApexExceptionClassFields(logEntries);
+        this.setComponentFields(logEntries);
+        this.setFlowDefinitionFields(logEntries);
+        this.setFlowVersionFields(logEntries);
+        this.setRecordNames(logEntries);
         // This method should run last, in case any other methods modify fields related to the checkboxes
-        this.setCheckboxFields();
+        this.setCheckboxFields(logEntries);
     }
 
     protected override void executeBeforeUpdate(Map<Id, SObject> triggerNewMap, Map<Id, SObject> triggerOldMap) {
-        this.logEntries = (List<LogEntry__c>) triggerNewMap.values();
+        List<LogEntry__c> logEntries = (List<LogEntry__c>) triggerNewMap.values();
 
         // Realistically, these checkbox fields probably only need to be set on insert
         // but some admins & devs might decide to update/append data in some of the related fields
         // and it conceptually feels weird for there to be scenarios where these fields could be inaccurate,
         // so keep them up to date just to be safe
-        this.setCheckboxFields();
+        this.setCheckboxFields(logEntries);
     }
 
-    private void setApexLoggingClassFields() {
+    private void setApexOriginClassFields(List<LogEntry__c> logEntries) {
         List<String> apexClassNames = new List<String>();
         List<LogEntry__c> apexLogEntries = new List<LogEntry__c>();
-        for (LogEntry__c logEntry : this.logEntries) {
+        for (LogEntry__c logEntry : logEntries) {
             if (logEntry.OriginType__c != 'Apex' || String.isBlank(logEntry.StackTrace__c) == true) {
                 continue;
             }
@@ -90,10 +87,10 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
         }
     }
 
-    private void setApexExceptionClassFields() {
+    private void setApexExceptionClassFields(List<LogEntry__c> logEntries) {
         List<String> apexClassNames = new List<String>();
         List<LogEntry__c> apexLogEntries = new List<LogEntry__c>();
-        for (LogEntry__c logEntry : this.logEntries) {
+        for (LogEntry__c logEntry : logEntries) {
             if (logEntry.OriginType__c != 'Apex' || String.isBlank(logEntry.ExceptionStackTrace__c) == true) {
                 continue;
             }
@@ -122,7 +119,7 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
         }
 
         for (LogEntry__c logEntry : apexLogEntries) {
-            ApexClass topLevelApexClass = classNameToApexClass.get(logEntry.ApexClassName__c);
+            ApexClass topLevelApexClass = classNameToApexClass.get(logEntry.ExceptionApexClassName__c);
             if (topLevelApexClass == null) {
                 return;
             }
@@ -137,8 +134,8 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
         }
     }
 
-    private void setComponentFields() {
-        for (LogEntry__c logEntry : this.logEntries) {
+    private void setComponentFields(List<LogEntry__c> logEntries) {
+        for (LogEntry__c logEntry : logEntries) {
             if (logEntry.OriginType__c == 'Component' && String.isNotBlank(logEntry.OriginLocation__c)) {
                 logEntry.ComponentApiName__c = logEntry.OriginLocation__c.substringBefore('.');
                 logEntry.ComponentFunctionName__c = logEntry.OriginLocation__c.substringAfterLast('.');
@@ -146,10 +143,10 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
         }
     }
 
-    private void setFlowDefinitionFields() {
+    private void setFlowDefinitionFields(List<LogEntry__c> logEntries) {
         List<String> flowApiNames = new List<String>();
         List<LogEntry__c> flowLogEntries = new List<LogEntry__c>();
-        for (LogEntry__c logEntry : this.logEntries) {
+        for (LogEntry__c logEntry : logEntries) {
             if (logEntry.OriginType__c == 'Flow' && String.isNotBlank(logEntry.OriginLocation__c)) {
                 flowApiNames.add(logEntry.OriginLocation__c);
                 flowLogEntries.add(logEntry);
@@ -189,10 +186,10 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
         }
     }
 
-    private void setFlowVersionFields() {
+    private void setFlowVersionFields(List<LogEntry__c> logEntries) {
         List<String> flowActiveVersionIds = new List<String>();
         List<LogEntry__c> flowLogEntries = new List<LogEntry__c>();
-        for (LogEntry__c logEntry : this.logEntries) {
+        for (LogEntry__c logEntry : logEntries) {
             if (logEntry.OriginType__c == 'Flow' && String.isNotBlank(logEntry.FlowActiveVersionId__c)) {
                 flowActiveVersionIds.add(logEntry.FlowActiveVersionId__c);
                 flowLogEntries.add(logEntry);
@@ -228,7 +225,7 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
     }
 
     @SuppressWarnings('PMD.OperationWithLimitsInLoop')
-    private void setRecordNames() {
+    private void setRecordNames(List<LogEntry__c> logEntries) {
         if (LoggerParameter.QUERY_RELATED_RECORD_DATA == false) {
             return;
         }
@@ -239,7 +236,7 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
 
         // 1. Figure out which SObjects & record IDs to query
         Map<Schema.SObjectType, List<Id>> sobjectTypeToRecords = new Map<Schema.SObjectType, List<Id>>();
-        for (LogEntry__c logEntry : this.logEntries) {
+        for (LogEntry__c logEntry : logEntries) {
             // Skip the log entry if there's no related record ID
             if (logEntry.RecordId__c == null) {
                 continue;
@@ -280,7 +277,7 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
         }
 
         // 3. Finally, save the record name on the log entry
-        for (LogEntry__c logEntry : this.logEntries) {
+        for (LogEntry__c logEntry : logEntries) {
             // Skip the log entry if there's no related record ID
             if (logEntry.RecordId__c == null) {
                 continue;
@@ -302,10 +299,10 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
         }
     }
 
-    private void setCheckboxFields() {
+    private void setCheckboxFields(List<LogEntry__c> logEntries) {
         // A formula field can't be used for checking if a long text area field is set/null
         // So, this code handles maintaing some checkbox fields via Apex instead
-        for (LogEntry__c logEntry : this.logEntries) {
+        for (LogEntry__c logEntry : logEntries) {
             logEntry.HasApexClassSnippet__c = logEntry.ApexClassSnippet__c != null;
             logEntry.HasExceptionApexClassSnippet__c = logEntry.ExceptionApexClassSnippet__c != null;
             logEntry.HasExceptionStackTrace__c = logEntry.ExceptionStackTrace__c != null;

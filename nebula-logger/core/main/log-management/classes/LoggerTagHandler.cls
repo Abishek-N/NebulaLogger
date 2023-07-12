@@ -10,9 +10,6 @@
 public without sharing class LoggerTagHandler extends LoggerSObjectHandler {
     private static final Map<String, Log__c> TRANSACTION_ID_TO_LOG = new Map<String, Log__c>();
 
-    @TestVisible
-    private List<LoggerTag__c> loggerTags;
-
     /**
      * @description Returns SObject Type that the handler is responsible for processing
      * @return      The instance of `SObjectType`
@@ -22,19 +19,19 @@ public without sharing class LoggerTagHandler extends LoggerSObjectHandler {
     }
 
     protected override void executeBeforeInsert(List<SObject> triggerNew) {
-        this.loggerTags = (List<LoggerTag__c>) triggerNew;
+        List<LoggerTag__c> loggerTags = (List<LoggerTag__c>) triggerNew;
 
-        this.setUniqueIdField();
+        this.setUniqueIdField(loggerTags);
     }
 
     protected override void executeBeforeUpdate(Map<Id, SObject> triggerNewMap, Map<Id, SObject> triggerOldMap) {
-        this.loggerTags = (List<LoggerTag__c>) triggerNewMap.values();
+        List<LoggerTag__c> loggerTags = (List<LoggerTag__c>) triggerNewMap.values();
 
-        this.setUniqueIdField();
+        this.setUniqueIdField(loggerTags);
     }
 
-    private void setUniqueIdField() {
-        for (LoggerTag__c loggerTag : this.loggerTags) {
+    private void setUniqueIdField(List<LoggerTag__c> loggerTags) {
+        for (LoggerTag__c loggerTag : loggerTags) {
             loggerTag.UniqueId__c = loggerTag.Name;
         }
     }

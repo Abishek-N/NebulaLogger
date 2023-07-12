@@ -414,7 +414,7 @@ private class LogEntryHandler_Tests {
     }
 
     @IsTest
-    static void it_should_set_skip_setting_apex_class_details_when_origin_location_is_null() {
+    static void it_should_set_skip_setting_origin_apex_class_details_when_origin_location_is_null() {
         Log__c log = [SELECT Id FROM Log__c LIMIT 1];
         LogEntry__c logEntry = new LogEntry__c(Log__c = log.Id, OriginLocation__c = null, OriginType__c = 'Apex');
         LoggerMockDataCreator.createDataBuilder(logEntry).populateRequiredFields().getRecord();
@@ -453,7 +453,7 @@ private class LogEntryHandler_Tests {
     }
 
     @IsTest
-    static void it_should_set_apex_class_details_for_top_level_class() {
+    static void it_should_set_origin_apex_class_details_for_top_level_class() {
         // FIXME the implementation does not seem to properly handle classes with a namespace prefix
         // (including when both the managed & unlocked packages are installed in an org), so skip the tests for now,
         // but revisit this test + implementation
@@ -530,7 +530,7 @@ private class LogEntryHandler_Tests {
     }
 
     @IsTest
-    static void it_should_set_apex_class_details_for_inner_class() {
+    static void it_should_set_origin_apex_class_details_for_inner_class() {
         // FIXME the implementation does not seem to properly handle classes with a namespace prefix
         // (including when both the managed & unlocked packages are installed in an org), so skip the tests for now,
         // but revisit this test + implementation
@@ -605,6 +605,206 @@ private class LogEntryHandler_Tests {
         System.Assert.areEqual(targetCodeLineNumber + 4, expectedCodeSnippet.endingLineNumber);
         System.Assert.areEqual(targetCodeLineNumber, expectedCodeSnippet.targetLineNumber);
         System.Assert.areEqual(JSON.serializePretty(expectedCodeSnippet), logEntry.ApexClassSnippet__c);
+    }
+
+    @IsTest
+    static void it_should_set_skip_setting_exception_apex_class_details_when_exception_type_is_null() {
+        Log__c log = [SELECT Id FROM Log__c LIMIT 1];
+        LogEntry__c logEntry = new LogEntry__c(Log__c = log.Id, OriginLocation__c = null, OriginType__c = 'Apex');
+        LoggerMockDataCreator.createDataBuilder(logEntry).populateRequiredFields().getRecord();
+
+        LoggerDataStore.getDatabase().insertRecord(logEntry);
+
+        System.Assert.areEqual(
+            2,
+            LoggerSObjectHandler.getExecutedHandlers().get(Schema.LogEntry__c.SObjectType).size(),
+            'Handler class should have executed two times - once for BEFORE_INSERT and once for AFTER_INSERT'
+        );
+        logEntry = [
+            SELECT
+                Id,
+                ExceptionApexClassApiVersion__c,
+                ExceptionApexClassCreatedDate__c,
+                ExceptionApexClassId__c,
+                ExceptionApexClassLastModifiedDate__c,
+                ExceptionApexClassName__c,
+                ExceptionApexInnerClassName__c,
+                ExceptionApexMethodName__c,
+                ExceptionType__c,
+                OriginType__c
+            FROM LogEntry__c
+            WHERE Id = :logEntry.Id
+        ];
+        System.Assert.areEqual('Apex', logEntry.OriginType__c);
+        System.Assert.isNull(logEntry.ExceptionApexClassApiVersion__c);
+        System.Assert.isNull(logEntry.ExceptionApexClassCreatedDate__c);
+        System.Assert.isNull(logEntry.ExceptionApexClassId__c);
+        System.Assert.isNull(logEntry.ExceptionApexClassLastModifiedDate__c);
+        System.Assert.isNull(logEntry.ExceptionApexClassName__c);
+        System.Assert.isNull(logEntry.ExceptionApexInnerClassName__c);
+        System.Assert.isNull(logEntry.ExceptionApexMethodName__c);
+        System.Assert.isNull(logEntry.ExceptionType__c);
+    }
+
+    @IsTest
+    static void it_should_set_exception_apex_class_details_for_top_level_class() {
+        // FIXME the implementation does not seem to properly handle classes with a namespace prefix
+        // (including when both the managed & unlocked packages are installed in an org), so skip the tests for now,
+        // but revisit this test + implementation
+        if (String.isNotBlank(Logger.getNamespacePrefix()) == true) {
+            return;
+        }
+
+        String exampleTopLevelClassName = LogEntryHandler_Tests.class.getName();
+        String methodName = 'getApexClasses';
+        Integer targetCodeLineNumber = 100; // arbitrary line number
+        String exampleTopLevelClassMethodName = exampleTopLevelClassName + '.' + methodName;
+        String mockStackTrace = 'Class.' + exampleTopLevelClassMethodName + ': line ' + targetCodeLineNumber + ', column 1';
+        ApexClass apexClass = [
+            SELECT Id, ApiVersion, Body, CreatedDate, LastModifiedDate
+            FROM ApexClass
+            WHERE NamespacePrefix = :getNamespacePrefix() AND Name = :exampleTopLevelClassName
+        ];
+        Log__c log = [SELECT Id FROM Log__c LIMIT 1];
+        LogEntry__c logEntry = new LogEntry__c(
+            ExceptionStackTrace__c = mockStackTrace,
+            Log__c = log.Id,
+            OriginLocation__c = exampleTopLevelClassMethodName,
+            OriginType__c = 'Apex'
+        );
+        LoggerMockDataCreator.createDataBuilder(logEntry).populateRequiredFields();
+
+        LoggerDataStore.getDatabase().insertRecord(logEntry);
+
+        System.Assert.areEqual(
+            2,
+            LoggerSObjectHandler.getExecutedHandlers().get(Schema.LogEntry__c.SObjectType).size(),
+            'Handler class should have executed two times - once for BEFORE_INSERT and once for AFTER_INSERT'
+        );
+        logEntry = [
+            SELECT
+                Id,
+                ExceptionApexClassApiVersion__c,
+                ExceptionApexClassCreatedDate__c,
+                ExceptionApexClassId__c,
+                ExceptionApexClassLastModifiedDate__c,
+                ExceptionApexClassName__c,
+                ExceptionApexClassSnippet__c,
+                ExceptionApexCodeLineNumber__c,
+                ExceptionApexInnerClassName__c,
+                ExceptionApexMethodName__c,
+                OriginLocation__c
+            FROM LogEntry__c
+            WHERE Id = :logEntry.Id
+        ];
+        System.Assert.areEqual(exampleTopLevelClassMethodName, logEntry.OriginLocation__c);
+        System.Assert.areEqual('v' + apexClass.ApiVersion, logEntry.ExceptionApexClassApiVersion__c);
+        System.Assert.areEqual(apexClass.CreatedDate, logEntry.ExceptionApexClassCreatedDate__c);
+        System.Assert.areEqual(apexClass.Id, logEntry.ExceptionApexClassId__c);
+        System.Assert.areEqual(apexClass.LastModifiedDate, logEntry.ExceptionApexClassLastModifiedDate__c);
+        System.Assert.areEqual(exampleTopLevelClassName, logEntry.ExceptionApexClassName__c);
+        System.Assert.isNull(logEntry.ExceptionApexInnerClassName__c);
+        System.Assert.areEqual(methodName, logEntry.ExceptionApexMethodName__c);
+        LogEntryHandler.ApexCodeSnippet expectedCodeSnippet = new LogEntryHandler.ApexCodeSnippet(
+            apexClass,
+            Integer.valueOf(logEntry.ExceptionApexCodeLineNumber__c)
+        );
+        Integer targetLeadingLines = 8;
+        Integer targetTrailingLines = 4;
+        List<String> codeLines = apexClass.Body.split('\n');
+        String expectedCodeSnippetString = '';
+        Integer startingLineNumberIndex = (targetCodeLineNumber - targetLeadingLines) - 1;
+        Integer endingLineNumberIndex = (targetCodeLineNumber + targetTrailingLines) - 1;
+        for (Integer i = startingLineNumberIndex; i <= endingLineNumberIndex; i++) {
+            String delimiter = String.isNotBlank(expectedCodeSnippetString) == true ? '\n' : '';
+            expectedCodeSnippetString += delimiter + codeLines.get(i);
+        }
+        System.Assert.areEqual(expectedCodeSnippetString, expectedCodeSnippet.code);
+        System.Assert.areEqual(targetCodeLineNumber - 8, expectedCodeSnippet.startingLineNumber);
+        System.Assert.areEqual(targetCodeLineNumber + 4, expectedCodeSnippet.endingLineNumber);
+        System.Assert.areEqual(targetCodeLineNumber, expectedCodeSnippet.targetLineNumber);
+        System.Assert.areEqual(JSON.serializePretty(expectedCodeSnippet), logEntry.ExceptionApexClassSnippet__c);
+    }
+
+    @IsTest
+    static void it_should_set_exception_apex_class_details_for_inner_class() {
+        // FIXME the implementation does not seem to properly handle classes with a namespace prefix
+        // (including when both the managed & unlocked packages are installed in an org), so skip the tests for now,
+        // but revisit this test + implementation
+        if (String.isNotBlank(Logger.getNamespacePrefix()) == true) {
+            return;
+        }
+
+        String exampleTopLevelClassName = LogEntryHandler_Tests.class.getName();
+        String exampleInnerClassName = MockLogManagementDataSelector.class.getName().substringAfter(exampleTopLevelClassName + '.');
+        String methodName = 'getApexClasses';
+        Integer targetCodeLineNumber = 100; // arbitrary line number
+        String exampleInnerClassMethodName = exampleTopLevelClassName + '.' + exampleInnerClassName + '.' + methodName;
+        String mockStackTrace = 'Class.' + exampleInnerClassMethodName + ': line ' + targetCodeLineNumber + ', column 1';
+        ApexClass apexClass = [
+            SELECT Id, ApiVersion, Body, CreatedDate, LastModifiedDate
+            FROM ApexClass
+            WHERE NamespacePrefix = :getNamespacePrefix() AND Name = :exampleTopLevelClassName
+        ];
+        Log__c log = [SELECT Id FROM Log__c LIMIT 1];
+        LogEntry__c logEntry = new LogEntry__c(
+            ExceptionStackTrace__c = mockStackTrace,
+            Log__c = log.Id,
+            OriginLocation__c = exampleInnerClassMethodName,
+            OriginType__c = 'Apex'
+        );
+        LoggerMockDataCreator.createDataBuilder(logEntry).populateRequiredFields();
+
+        LoggerDataStore.getDatabase().insertRecord(logEntry);
+
+        System.Assert.areEqual(
+            2,
+            LoggerSObjectHandler.getExecutedHandlers().get(Schema.LogEntry__c.SObjectType).size(),
+            'Handler class should have executed two times - once for BEFORE_INSERT and once for AFTER_INSERT'
+        );
+        logEntry = [
+            SELECT
+                Id,
+                ExceptionApexClassApiVersion__c,
+                ExceptionApexClassCreatedDate__c,
+                ExceptionApexClassId__c,
+                ExceptionApexClassLastModifiedDate__c,
+                ExceptionApexClassName__c,
+                ExceptionApexClassSnippet__c,
+                ExceptionApexCodeLineNumber__c,
+                ExceptionApexInnerClassName__c,
+                ExceptionApexMethodName__c,
+                OriginLocation__c
+            FROM LogEntry__c
+            WHERE Id = :logEntry.Id
+        ];
+        System.Assert.areEqual(exampleInnerClassMethodName, logEntry.OriginLocation__c);
+        System.Assert.areEqual('v' + apexClass.ApiVersion, logEntry.ExceptionApexClassApiVersion__c);
+        System.Assert.areEqual(apexClass.CreatedDate, logEntry.ExceptionApexClassCreatedDate__c);
+        System.Assert.areEqual(apexClass.Id, logEntry.ExceptionApexClassId__c);
+        System.Assert.areEqual(apexClass.LastModifiedDate, logEntry.ExceptionApexClassLastModifiedDate__c);
+        System.Assert.areEqual(exampleTopLevelClassName, logEntry.ExceptionApexClassName__c);
+        System.Assert.areEqual(exampleInnerClassName, logEntry.ExceptionApexInnerClassName__c);
+        System.Assert.areEqual(methodName, logEntry.ExceptionApexMethodName__c);
+        LogEntryHandler.ApexCodeSnippet expectedCodeSnippet = new LogEntryHandler.ApexCodeSnippet(
+            apexClass,
+            Integer.valueOf(logEntry.ExceptionApexCodeLineNumber__c)
+        );
+        Integer targetLeadingLines = 8;
+        Integer targetTrailingLines = 4;
+        List<String> codeLines = apexClass.Body.split('\n');
+        String expectedCodeSnippetString = '';
+        Integer startingLineNumberIndex = (targetCodeLineNumber - targetLeadingLines) - 1;
+        Integer endingLineNumberIndex = (targetCodeLineNumber + targetTrailingLines) - 1;
+        for (Integer i = startingLineNumberIndex; i <= endingLineNumberIndex; i++) {
+            String delimiter = String.isNotBlank(expectedCodeSnippetString) == true ? '\n' : '';
+            expectedCodeSnippetString += delimiter + codeLines.get(i);
+        }
+        System.Assert.areEqual(expectedCodeSnippetString, expectedCodeSnippet.code);
+        System.Assert.areEqual(targetCodeLineNumber - 8, expectedCodeSnippet.startingLineNumber);
+        System.Assert.areEqual(targetCodeLineNumber + 4, expectedCodeSnippet.endingLineNumber);
+        System.Assert.areEqual(targetCodeLineNumber, expectedCodeSnippet.targetLineNumber);
+        System.Assert.areEqual(JSON.serializePretty(expectedCodeSnippet), logEntry.ExceptionApexClassSnippet__c);
     }
 
     @IsTest

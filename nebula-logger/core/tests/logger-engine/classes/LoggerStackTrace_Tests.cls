@@ -88,7 +88,7 @@ private class LoggerStackTrace_Tests {
     static void it_should_ignore_stack_trace_line_when_matching_class_type_has_been_ignored() {
         String ignoredTopLevelClassName = LoggerStackTrace_Tests.class.getName();
         String ignoredMethodName = 'it_should_ignore_stack_trace_line_when_matching_class_type_has_been_ignored';
-        String ignoredStackTraceLine = 'Class.' + ignoredTopLevelClassName + ignoredMethodName + ': line 99999, column 1';
+        String ignoredStackTraceLine = 'Class.' + ignoredTopLevelClassName + '.' + ignoredMethodName + ': line 99999, column 1';
         String nonIgnoredTopLevelClassName = 'TheNextClassNameInTheStack';
         Integer nonIgnoredTopLevelClassLineNumber = 987;
         String nonIgnoredMethodName = 'doSomething';

@@ -11,12 +11,6 @@
 public without sharing class LogHandler extends LoggerSObjectHandler {
     private static final Map<String, LogStatus__mdt> MOCK_LOG_STATUS_TO_STATUS = new Map<String, LogStatus__mdt>();
 
-    @TestVisible
-    private List<Log__c> logs;
-    @TestVisible
-    private Map<Id, Log__c> oldLogsById;
-    private Map<Id, LoggerScenario__c> loggerScenariosById;
-
     /**
      * @description Returns SObject Type that the handler is responsible for processing
      * @return      The instance of `SObjectType`
@@ -26,43 +20,38 @@ public without sharing class LogHandler extends LoggerSObjectHandler {
     }
 
     protected override void executeBeforeInsert(List<SObject> triggerNew) {
-        this.logs = (List<Log__c>) triggerNew;
-        this.loggerScenariosById = queryLoggerScenarios(this.logs);
+        List<Log__c> logs = (List<Log__c>) triggerNew;
+        Map<String, LogStatus__mdt> logStatusNameToStatus = loadActiveLogStatuses();
+        Map<Id, LoggerScenario__c> loggerScenarioById = queryLoggerScenarios(logs);
 
-        this.setHasCommentsField();
-        this.setClosedStatusFields();
+        this.setClosedStatusFields(logs, logStatusNameToStatus);
         // The log OwnerId field should support being manually changed, so only auto-set it on insert
-        this.setOwnerId();
-        this.setParentLog();
+        this.setOwnerId(logs);
+        this.setParentLog(logs);
         // The log retention date field should support being manually changed, so only auto-set it on insert
-        this.setLogRetentionDetails();
+        this.setLogRetentionDetails(logs, loggerScenarioById);
+        this.setHasCommentsField(logs);
     }
 
     protected override void executeBeforeUpdate(Map<Id, SObject> triggerNewMap, Map<Id, SObject> triggerOldMap) {
-        this.logs = (List<Log__c>) triggerNewMap.values();
-        this.oldLogsById = (Map<Id, Log__c>) triggerOldMap;
+        List<Log__c> logs = (List<Log__c>) triggerNewMap.values();
+        Map<Id, Log__c> oldLogsById = (Map<Id, Log__c>) triggerOldMap;
+        Map<String, LogStatus__mdt> logStatusNameToStatus = loadActiveLogStatuses();
 
-        this.setHasCommentsField();
-        this.setClosedStatusFields();
+        this.setClosedStatusFields(logs, logStatusNameToStatus);
         // Priority logic relies on roll-up fields, so only run on update (after log entries are inserted)
-        this.setPriority();
+        this.setPriority(logs, oldLogsById);
+        this.setHasCommentsField(logs);
     }
 
     protected override void executeAfterInsert(Map<Id, SObject> triggerNewMap) {
-        this.logs = (List<Log__c>) triggerNewMap.values();
+        List<Log__c> logs = (List<Log__c>) triggerNewMap.values();
 
-        this.shareLogsWithLoggingUsers();
+        this.shareLogsWithLoggingUsers(logs);
     }
 
-    private void setHasCommentsField() {
-        for (Log__c log : this.logs) {
-            log.HasComments__c = String.isNotBlank(log.Comments__c);
-        }
-    }
-
-    private void setClosedStatusFields() {
-        Map<String, LogStatus__mdt> logStatusNameToStatus = loadActiveLogStatuses();
-        for (Log__c log : this.logs) {
+    private void setClosedStatusFields(List<Log__c> logs, Map<String, LogStatus__mdt> logStatusNameToStatus) {
+        for (Log__c log : logs) {
             // Determine if the status is considered closed (based on `LogStatus__mdt` custom metadata)
             LogStatus__mdt logStatus = logStatusNameToStatus.get(log.Status__c);
             if (logStatus != null) {
@@ -81,11 +70,11 @@ public without sharing class LogHandler extends LoggerSObjectHandler {
         }
     }
 
-    private void setOwnerId() {
+    private void setOwnerId(List<Log__c> logs) {
         // Loop through the logs and figure out what value has been configured as the default owner (if any)
         Map<Id, String> ownerNamesByLoggingUserId = new Map<Id, String>();
         List<Log__c> logsToUpdate = new List<Log__c>();
-        for (Log__c log : this.logs) {
+        for (Log__c log : logs) {
             String loggingUserDefaultLogOwner = getLoggingUserSettings(log).DefaultLogOwner__c;
 
             if (String.isBlank(loggingUserDefaultLogOwner) == true) {
@@ -115,9 +104,9 @@ public without sharing class LogHandler extends LoggerSObjectHandler {
         }
     }
 
-    private void setParentLog() {
+    private void setParentLog(List<Log__c> logs) {
         List<String> parentLogTransactionIds = new List<String>();
-        for (Log__c log : this.logs) {
+        for (Log__c log : logs) {
             if (String.isNotBlank(log.ParentLogTransactionId__c) == true) {
                 parentLogTransactionIds.add(log.ParentLogTransactionId__c);
             }
@@ -132,15 +121,15 @@ public without sharing class LogHandler extends LoggerSObjectHandler {
             parentLogTransactionIdToRecordId.put(parentLog.TransactionId__c, parentLog.Id);
         }
 
-        for (Log__c log : this.logs) {
+        for (Log__c log : logs) {
             if (String.isNotBlank(log.ParentLogTransactionId__c) == true) {
                 log.ParentLog__c = parentLogTransactionIdToRecordId.get(log.ParentLogTransactionId__c);
             }
         }
     }
 
-    private void setLogRetentionDetails() {
-        for (Log__c log : this.logs) {
+    private void setLogRetentionDetails(List<Log__c> logs, Map<Id, LoggerScenario__c> loggerScenarioById) {
+        for (Log__c log : logs) {
             // If the retention date has already been populated, leave it as-is
             if (log.LogRetentionDate__c != null) {
                 continue;
@@ -152,7 +141,7 @@ public without sharing class LogHandler extends LoggerSObjectHandler {
             // Load the configured scenario rule (if one exists)
             LoggerScenarioRule__mdt matchingScenarioRule;
             if (log.TransactionScenario__c != null) {
-                LoggerScenario__c loggerScenario = this.loggerScenariosById.get(log.TransactionScenario__c);
+                LoggerScenario__c loggerScenario = loggerScenarioById.get(log.TransactionScenario__c);
                 matchingScenarioRule = LoggerScenarioRule.getInstance(loggerScenario.UniqueId__c);
                 if (
                     matchingScenarioRule != null &&
@@ -175,7 +164,7 @@ public without sharing class LogHandler extends LoggerSObjectHandler {
         }
     }
 
-    private void setPriority() {
+    private void setPriority(List<Log__c> logs, Map<Id, Log__c> oldLogsById) {
         List<Schema.PicklistEntry> picklistEntries = Schema.Log__c.Priority__c.getDescribe().getPicklistValues();
 
         // 3 assumptions
@@ -185,8 +174,8 @@ public without sharing class LogHandler extends LoggerSObjectHandler {
         final String firstPriority = picklistEntries.get(0).getValue();
         final String secondPriority = picklistEntries.get(1).getValue();
 
-        for (Log__c log : this.logs) {
-            Log__c oldLog = this.oldLogsById.get(log.Id);
+        for (Log__c log : logs) {
+            Log__c oldLog = oldLogsById.get(log.Id);
 
             if (log.TotalERRORLogEntries__c != oldLog.TotalERRORLogEntries__c && log.TotalERRORLogEntries__c > 0) {
                 log.Priority__c = firstPriority;
@@ -196,10 +185,16 @@ public without sharing class LogHandler extends LoggerSObjectHandler {
         }
     }
 
-    private void shareLogsWithLoggingUsers() {
+    private void setHasCommentsField(List<Log__c> logs) {
+        for (Log__c log : logs) {
+            log.HasComments__c = String.isNotBlank(log.Comments__c);
+        }
+    }
+
+    private void shareLogsWithLoggingUsers(List<Log__c> logs) {
         // For each log record, share the record with the user that created the log (Log__c.LoggedBy__c)
         List<Log__Share> logShares = new List<Log__Share>();
-        for (Log__c log : this.logs) {
+        for (Log__c log : logs) {
             // Anonymous logs don't have a user set for LoggedBy__c, so there's no one to share the record with
             if (log.LoggedBy__c == null) {
                 continue;
@@ -253,17 +248,17 @@ public without sharing class LogHandler extends LoggerSObjectHandler {
             }
         }
 
-        Map<Id, LoggerScenario__c> loggerScenariosById = new Map<Id, LoggerScenario__c>();
+        Map<Id, LoggerScenario__c> loggerScenarioById = new Map<Id, LoggerScenario__c>();
 
         if (loggerScenarioIds.isEmpty() == true) {
-            return loggerScenariosById;
+            return loggerScenarioById;
         }
 
         List<LoggerScenario__c> matchingLoggerScenarios = LogManagementDataSelector.getInstance().getLoggerScenariosById(loggerScenarioIds);
         if (matchingLoggerScenarios != null && matchingLoggerScenarios.isEmpty() == false) {
-            loggerScenariosById = new Map<Id, LoggerScenario__c>(matchingLoggerScenarios);
+            loggerScenarioById = new Map<Id, LoggerScenario__c>(matchingLoggerScenarios);
         }
-        return loggerScenariosById;
+        return loggerScenarioById;
     }
 
     private static Map<String, Id> queryQueues(List<String> possibleQueueNames) {

@@ -10,9 +10,6 @@
 public without sharing class LogEntryTagHandler extends LoggerSObjectHandler {
     private static final Map<String, Log__c> TRANSACTION_ID_TO_LOG = new Map<String, Log__c>();
 
-    @TestVisible
-    private List<LogEntryTag__c> logEntryTags;
-
     /**
      * @description Generates a unique composite key for the `LogEntryTag__c` record, which
      *              is used to set the field `LogEntryTag__c.UniqueId__c`
@@ -32,19 +29,19 @@ public without sharing class LogEntryTagHandler extends LoggerSObjectHandler {
     }
 
     protected override void executeBeforeInsert(List<SObject> triggerNew) {
-        this.logEntryTags = (List<LogEntryTag__c>) triggerNew;
+        List<LogEntryTag__c> logEntryTags = (List<LogEntryTag__c>) triggerNew;
 
-        this.setUniqueIdField();
+        this.setUniqueIdField(logEntryTags);
     }
 
     protected override void executeBeforeUpdate(Map<Id, SObject> triggerNewMap, Map<Id, SObject> triggerOldMap) {
-        this.logEntryTags = (List<LogEntryTag__c>) triggerNewMap.values();
+        List<LogEntryTag__c> logEntryTags = (List<LogEntryTag__c>) triggerNewMap.values();
 
-        this.setUniqueIdField();
+        this.setUniqueIdField(logEntryTags);
     }
 
-    private void setUniqueIdField() {
-        for (LogEntryTag__c logEntryTag : this.logEntryTags) {
+    private void setUniqueIdField(List<LogEntryTag__c> logEntryTags) {
+        for (LogEntryTag__c logEntryTag : logEntryTags) {
             logEntryTag.UniqueId__c = generateUniqueId(logEntryTag);
         }
     }
