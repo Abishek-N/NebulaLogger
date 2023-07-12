@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>HasApexClassSnippet__c</fullName>
+    <fullName>ExceptionApexCodeSnippet__c</fullName>
     <businessStatus>Active</businessStatus>
     <complianceGroup>None</complianceGroup>
-    <defaultValue>false</defaultValue>
     <externalId>false</externalId>
-    <label>Has Apex Class Snippet</label>
+    <inlineHelpText>A JSON snippet of the Apex class&apos;s code that threw the exception</inlineHelpText>
+    <label>Exception Apex Code Snippet</label>
+    <!-- TODO finalize length needed -->
+    <length>1000</length>
     <securityClassification>Confidential</securityClassification>
     <trackFeedHistory>false</trackFeedHistory>
     <trackTrending>false</trackTrending>
-    <type>Checkbox</type>
+    <type>LongTextArea</type>
+    <visibleLines>8</visibleLines>
 </CustomField>

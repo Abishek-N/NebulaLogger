@@ -495,8 +495,8 @@ private class LogEntryHandler_Tests {
                 ApexClassId__c,
                 ApexClassLastModifiedDate__c,
                 ApexClassName__c,
-                ApexClassSnippet__c,
                 ApexCodeLineNumber__c,
+                ApexCodeSnippet__c,
                 ApexInnerClassName__c,
                 ApexMethodName__c,
                 OriginLocation__c
@@ -526,7 +526,7 @@ private class LogEntryHandler_Tests {
         System.Assert.areEqual(targetCodeLineNumber - 8, expectedCodeSnippet.startingLineNumber);
         System.Assert.areEqual(targetCodeLineNumber + 4, expectedCodeSnippet.endingLineNumber);
         System.Assert.areEqual(targetCodeLineNumber, expectedCodeSnippet.targetLineNumber);
-        System.Assert.areEqual(JSON.serializePretty(expectedCodeSnippet), logEntry.ApexClassSnippet__c);
+        System.Assert.areEqual(JSON.serializePretty(expectedCodeSnippet), logEntry.ApexCodeSnippet__c);
     }
 
     @IsTest
@@ -573,8 +573,8 @@ private class LogEntryHandler_Tests {
                 ApexClassId__c,
                 ApexClassLastModifiedDate__c,
                 ApexClassName__c,
-                ApexClassSnippet__c,
                 ApexCodeLineNumber__c,
+                ApexCodeSnippet__c,
                 ApexInnerClassName__c,
                 ApexMethodName__c,
                 OriginLocation__c
@@ -604,7 +604,7 @@ private class LogEntryHandler_Tests {
         System.Assert.areEqual(targetCodeLineNumber - 8, expectedCodeSnippet.startingLineNumber);
         System.Assert.areEqual(targetCodeLineNumber + 4, expectedCodeSnippet.endingLineNumber);
         System.Assert.areEqual(targetCodeLineNumber, expectedCodeSnippet.targetLineNumber);
-        System.Assert.areEqual(JSON.serializePretty(expectedCodeSnippet), logEntry.ApexClassSnippet__c);
+        System.Assert.areEqual(JSON.serializePretty(expectedCodeSnippet), logEntry.ApexCodeSnippet__c);
     }
 
     @IsTest
@@ -689,8 +689,8 @@ private class LogEntryHandler_Tests {
                 ExceptionApexClassId__c,
                 ExceptionApexClassLastModifiedDate__c,
                 ExceptionApexClassName__c,
-                ExceptionApexClassSnippet__c,
                 ExceptionApexCodeLineNumber__c,
+                ExceptionApexCodeSnippet__c,
                 ExceptionApexInnerClassName__c,
                 ExceptionApexMethodName__c,
                 OriginLocation__c
@@ -723,7 +723,7 @@ private class LogEntryHandler_Tests {
         System.Assert.areEqual(targetCodeLineNumber - 8, expectedCodeSnippet.startingLineNumber);
         System.Assert.areEqual(targetCodeLineNumber + 4, expectedCodeSnippet.endingLineNumber);
         System.Assert.areEqual(targetCodeLineNumber, expectedCodeSnippet.targetLineNumber);
-        System.Assert.areEqual(JSON.serializePretty(expectedCodeSnippet), logEntry.ExceptionApexClassSnippet__c);
+        System.Assert.areEqual(JSON.serializePretty(expectedCodeSnippet), logEntry.ExceptionApexCodeSnippet__c);
     }
 
     @IsTest
@@ -770,8 +770,8 @@ private class LogEntryHandler_Tests {
                 ExceptionApexClassId__c,
                 ExceptionApexClassLastModifiedDate__c,
                 ExceptionApexClassName__c,
-                ExceptionApexClassSnippet__c,
                 ExceptionApexCodeLineNumber__c,
+                ExceptionApexCodeSnippet__c,
                 ExceptionApexInnerClassName__c,
                 ExceptionApexMethodName__c,
                 OriginLocation__c
@@ -804,7 +804,7 @@ private class LogEntryHandler_Tests {
         System.Assert.areEqual(targetCodeLineNumber - 8, expectedCodeSnippet.startingLineNumber);
         System.Assert.areEqual(targetCodeLineNumber + 4, expectedCodeSnippet.endingLineNumber);
         System.Assert.areEqual(targetCodeLineNumber, expectedCodeSnippet.targetLineNumber);
-        System.Assert.areEqual(JSON.serializePretty(expectedCodeSnippet), logEntry.ExceptionApexClassSnippet__c);
+        System.Assert.areEqual(JSON.serializePretty(expectedCodeSnippet), logEntry.ExceptionApexCodeSnippet__c);
     }
 
     @IsTest

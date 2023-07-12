@@ -83,7 +83,7 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
             logEntry.ApexClassCreatedDate__c = topLevelApexClass.CreatedDate;
             logEntry.ApexClassId__c = topLevelApexClass.Id;
             logEntry.ApexClassLastModifiedDate__c = topLevelApexClass.LastModifiedDate;
-            logEntry.ApexClassSnippet__c = JSON.serializePretty(new ApexCodeSnippet(topLevelApexClass, Integer.valueOf(logEntry.ApexCodeLineNumber__c)));
+            logEntry.ApexCodeSnippet__c = JSON.serializePretty(new ApexCodeSnippet(topLevelApexClass, Integer.valueOf(logEntry.ApexCodeLineNumber__c)));
         }
     }
 
@@ -128,7 +128,7 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
             logEntry.ExceptionApexClassCreatedDate__c = topLevelApexClass.CreatedDate;
             logEntry.ExceptionApexClassId__c = topLevelApexClass.Id;
             logEntry.ExceptionApexClassLastModifiedDate__c = topLevelApexClass.LastModifiedDate;
-            logEntry.ExceptionApexClassSnippet__c = JSON.serializePretty(
+            logEntry.ExceptionApexCodeSnippet__c = JSON.serializePretty(
                 new ApexCodeSnippet(topLevelApexClass, Integer.valueOf(logEntry.ExceptionApexCodeLineNumber__c))
             );
         }
@@ -303,8 +303,8 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
         // A formula field can't be used for checking if a long text area field is set/null
         // So, this code handles maintaing some checkbox fields via Apex instead
         for (LogEntry__c logEntry : logEntries) {
-            logEntry.HasApexClassSnippet__c = logEntry.ApexClassSnippet__c != null;
-            logEntry.HasExceptionApexClassSnippet__c = logEntry.ExceptionApexClassSnippet__c != null;
+            logEntry.HasApexCodeSnippet__c = logEntry.ApexCodeSnippet__c != null;
+            logEntry.HasExceptionApexCodeSnippet__c = logEntry.ExceptionApexCodeSnippet__c != null;
             logEntry.HasExceptionStackTrace__c = logEntry.ExceptionStackTrace__c != null;
             logEntry.HasInlineTags__c = logEntry.Tags__c != null;
             logEntry.HasRecordJson__c = logEntry.RecordJson__c != null;

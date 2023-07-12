@@ -79,7 +79,7 @@ describe('c-log-entry-metadata-viewer', () => {
         expect(stackTraceField).toBeTruthy();
         const originCodeViewer = element.shadowRoot.querySelector('c-logger-code-viewer[data-id="originApexCodeSnippet"]');
         expect(originCodeViewer).toBeTruthy();
-        const expectedCodeSnippet = JSON.parse(mockLogEntryRecord.fields.ApexClassSnippet__c.value);
+        const expectedCodeSnippet = JSON.parse(mockLogEntryRecord.fields.ApexCodeSnippet__c.value);
         expect(originCodeViewer.code).toBe(expectedCodeSnippet.code);
     });
 
@@ -105,7 +105,7 @@ describe('c-log-entry-metadata-viewer', () => {
         expect(exceptionStackTraceField).toBeTruthy();
         const exceptionCodeViewer = element.shadowRoot.querySelector('c-logger-code-viewer[data-id="exceptionApexCodeSnippet"]');
         expect(exceptionCodeViewer).toBeTruthy();
-        const expectedCodeSnippet = JSON.parse(mockLogEntryRecord.fields.ExceptionApexClassSnippet__c.value);
+        const expectedCodeSnippet = JSON.parse(mockLogEntryRecord.fields.ExceptionApexCodeSnippet__c.value);
         expect(exceptionCodeViewer.code).toBe(expectedCodeSnippet.code);
     });
 

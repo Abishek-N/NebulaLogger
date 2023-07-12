@@ -9,21 +9,21 @@ import getMetadata from '@salesforce/apex/LogEntryMetadataViewerController.getMe
 
 import LOG_ENTRY_OBJECT from '@salesforce/schema/LogEntry__c';
 import EXCEPTION_APEX_CLASS_NAME_FIELD from '@salesforce/schema/LogEntry__c.ExceptionApexClassName__c';
-import EXCEPTION_APEX_CLASS_SNIPPET_FIELD from '@salesforce/schema/LogEntry__c.ExceptionApexClassSnippet__c';
+import EXCEPTION_APEX_CODE_SNIPPET_FIELD from '@salesforce/schema/LogEntry__c.ExceptionApexCodeSnippet__c';
 import EXCEPTION_TYPE_FIELD from '@salesforce/schema/LogEntry__c.ExceptionType__c';
 import MESSAGE_MASKED_FIELD from '@salesforce/schema/LogEntry__c.MessageMasked__c';
 import MESSAGE_TRUNCATED_FIELD from '@salesforce/schema/LogEntry__c.MessageTruncated__c';
 import ORIGIN_APEX_CLASS_NAME_FIELD from '@salesforce/schema/LogEntry__c.ApexClassName__c';
-import ORIGIN_APEX_CLASS_SNIPPET_FIELD from '@salesforce/schema/LogEntry__c.ApexClassSnippet__c';
+import ORIGIN_APEX_CODE_SNIPPET_FIELD from '@salesforce/schema/LogEntry__c.ApexCodeSnippet__c';
 
 const LOG_ENTRY_FIELDS = [
     EXCEPTION_APEX_CLASS_NAME_FIELD,
-    EXCEPTION_APEX_CLASS_SNIPPET_FIELD,
+    EXCEPTION_APEX_CODE_SNIPPET_FIELD,
     EXCEPTION_TYPE_FIELD,
     MESSAGE_MASKED_FIELD,
     MESSAGE_TRUNCATED_FIELD,
     ORIGIN_APEX_CLASS_NAME_FIELD,
-    ORIGIN_APEX_CLASS_SNIPPET_FIELD
+    ORIGIN_APEX_CODE_SNIPPET_FIELD
 ];
 
 export default class LogEntryMetadataViewer extends LightningElement {
@@ -90,14 +90,14 @@ export default class LogEntryMetadataViewer extends LightningElement {
     wiredGetLogEntry({ data }) {
         if (data) {
             this._logEntry = data;
-            const originApexCodeSnippetValue = getFieldValue(this._logEntry, ORIGIN_APEX_CLASS_SNIPPET_FIELD);
+            const originApexCodeSnippetValue = getFieldValue(this._logEntry, ORIGIN_APEX_CODE_SNIPPET_FIELD);
             if (originApexCodeSnippetValue) {
                 const apexClassName = getFieldValue(this._logEntry, ORIGIN_APEX_CLASS_NAME_FIELD) + '.cls';
                 this.originApexCodeSnippet = { ...JSON.parse(originApexCodeSnippetValue), ...{ language: 'apex', title: apexClassName } };
             }
 
             if (this.showExceptionDetails) {
-                const exceptionApexCodeSnippetValue = getFieldValue(this._logEntry, EXCEPTION_APEX_CLASS_SNIPPET_FIELD);
+                const exceptionApexCodeSnippetValue = getFieldValue(this._logEntry, EXCEPTION_APEX_CODE_SNIPPET_FIELD);
                 if (exceptionApexCodeSnippetValue) {
                     const apexClassName = getFieldValue(this._logEntry, EXCEPTION_APEX_CLASS_NAME_FIELD) + '.cls';
                     this.exceptionApexCodeSnippet = { ...JSON.parse(exceptionApexCodeSnippetValue), ...{ language: 'apex', title: apexClassName } };
