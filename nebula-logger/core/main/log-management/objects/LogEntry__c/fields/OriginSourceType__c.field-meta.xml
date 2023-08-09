@@ -20,16 +20,16 @@
                 <label>AnonymousBlock</label>
             </value>
             <value>
-                <fullName>Class</fullName>
+                <fullName>ApexClass</fullName>
                 <color>#A845DC</color>
                 <default>false</default>
-                <label>Class</label>
+                <label>ApexClass</label>
             </value>
             <value>
-                <fullName>Trigger</fullName>
+                <fullName>ApexTrigger</fullName>
                 <color>#FFCC33</color>
                 <default>false</default>
-                <label>Trigger</label>
+                <label>ApexTrigger</label>
             </value>
         </valueSetDefinition>
     </valueSet>

@@ -144,7 +144,9 @@ jobs:
 
             - name: 'Install npm dependencies'
               if: steps.cache-npm.outputs.cache-hit != 'true'
-              run: npm ci
+              run: |
+                  npm ci
+                  npm run sf:plugins:link:packaging
 
             - name: 'Authorize Dev Hub'
               shell: bash
@@ -205,7 +207,9 @@ jobs:
 
             - name: 'Install npm dependencies'
               if: steps.cache-npm.outputs.cache-hit != 'true'
-              run: npm ci
+              run: |
+                  npm ci
+                  npm run sf:plugins:link:packaging
 
             - name: 'Authorize Dev Hub'
               shell: bash
@@ -323,7 +327,9 @@ jobs:
 
             - name: 'Install npm dependencies'
               if: steps.cache-npm.outputs.cache-hit != 'true'
-              run: npm ci
+              run: |
+                  npm ci
+                  npm run sf:plugins:link:packaging
 
             - name: 'Authorize Dev Hub'
               shell: bash
@@ -367,8 +373,8 @@ jobs:
               run: |
                   git config --local user.email "action@github.com"
                   git config --local user.name "GitHub Action Bot"
-                  # npm run sf:plugins:link:bummer
-                  echo y | npx sf plugins install @jongpie/sfdx-bummer-plugin --force
+                  npm run sf:plugins:link:bummer
+                  # echo y | npx sf plugins install @jongpie/sfdx-bummer-plugin --force
                   npx sf bummer:package:aliases:sort
                   npx prettier --write ./sfdx-project.json
                   git add ./sfdx-project.json
@@ -396,7 +402,9 @@ jobs:
 
             - name: 'Install npm dependencies'
               if: steps.cache-npm.outputs.cache-hit != 'true'
-              run: npm ci
+              run: |
+                  npm ci
+                  npm run sf:plugins:link:packaging
 
             - name: 'Authorize Dev Hub'
               shell: bash
