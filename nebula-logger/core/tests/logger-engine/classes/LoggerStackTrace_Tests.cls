@@ -1,15 +1,21 @@
 @SuppressWarnings('PMD.ApexDoc, PMD.MethodNamingConventions')
 @IsTest
 private class LoggerStackTrace_Tests {
+    private final static String APEX_SOURCE_TYPE_ANONYMOUS_BLOCK = 'AnonymousBlock';
+    private final static String APEX_SOURCE_TYPE_CLASS = 'Class';
+    private final static String APEX_SOURCE_TYPE_TRIGGER = 'Trigger';
+
     @IsTest
     static void it_should_set_details_for_parameterless_constructor() {
         String topLevelClassName = LoggerStackTrace_Tests.class.getName();
         String methodName = 'it_should_set_details_for_parameterless_constructor';
         String expectedOriginLocation = topLevelClassName + '.' + methodName;
-        Integer expectedSourceLineNumber = 11; // Manually-maintained value for the line number below where parameterlessStackTrace is initialized
+        Integer expectedSourceLineNumber = new System.DmlException().getLineNumber() + 2; // Expected value is the line number below where parameterlessStackTrace is initialized
 
         LoggerStackTrace parameterlessStackTrace = new LoggerStackTrace();
 
+        System.Assert.areEqual(APEX_SOURCE_TYPE_CLASS, parameterlessStackTrace.apexSourceType);
+        System.Assert.isNull(parameterlessStackTrace.apexTriggerName);
         System.Assert.areEqual(topLevelClassName, parameterlessStackTrace.apexTopLevelClassName);
         System.Assert.isNull(parameterlessStackTrace.apexInnerClassName);
         System.Assert.areEqual(expectedSourceLineNumber, parameterlessStackTrace.apexCodeLineNumber);
@@ -25,6 +31,8 @@ private class LoggerStackTrace_Tests {
 
         LoggerStackTrace exceptionBasedStackTrace = new LoggerStackTrace(apexException);
 
+        System.Assert.areEqual(APEX_SOURCE_TYPE_CLASS, exceptionBasedStackTrace.apexSourceType);
+        System.Assert.isNull(exceptionBasedStackTrace.apexTriggerName);
         System.Assert.areEqual(stringBasedStackTrace.apexTopLevelClassName, exceptionBasedStackTrace.apexTopLevelClassName);
         System.Assert.areEqual(stringBasedStackTrace.apexInnerClassName, exceptionBasedStackTrace.apexInnerClassName);
         System.Assert.areEqual(stringBasedStackTrace.apexCodeLineNumber, exceptionBasedStackTrace.apexCodeLineNumber);
@@ -50,6 +58,8 @@ private class LoggerStackTrace_Tests {
 
         LoggerStackTrace stackTrace = new LoggerStackTrace(constructedClass.getStackTraceString());
 
+        System.Assert.areEqual(APEX_SOURCE_TYPE_CLASS, stackTrace.apexSourceType);
+        System.Assert.isNull(stackTrace.apexTriggerName);
         System.Assert.areEqual(topLevelClassName, stackTrace.apexTopLevelClassName);
         System.Assert.areEqual(innerClassName, stackTrace.apexInnerClassName);
         // Just a null check for the code line number because it's difficult to try to determine the specific line number in a test
@@ -75,6 +85,8 @@ private class LoggerStackTrace_Tests {
 
         LoggerStackTrace stackTrace = new LoggerStackTrace(stackTraceGenerator.getStackTraceString());
 
+        System.Assert.areEqual(APEX_SOURCE_TYPE_CLASS, stackTrace.apexSourceType);
+        System.Assert.isNull(stackTrace.apexTriggerName);
         System.Assert.areEqual(topLevelClassName, stackTrace.apexTopLevelClassName);
         System.Assert.isNull(stackTrace.apexInnerClassName);
         // Just a null check for the code line number because it's difficult to try to determine the specific line number in a test
@@ -105,6 +117,8 @@ private class LoggerStackTrace_Tests {
         LoggerStackTrace.ignoreOrigin(LoggerStackTrace_Tests.class);
         LoggerStackTrace stackTrace = new LoggerStackTrace(mockStackTrace);
 
+        System.Assert.areEqual(APEX_SOURCE_TYPE_CLASS, stackTrace.apexSourceType);
+        System.Assert.isNull(stackTrace.apexTriggerName);
         System.Assert.areEqual(nonIgnoredTopLevelClassName, stackTrace.apexTopLevelClassName);
         System.Assert.isNull(stackTrace.apexInnerClassName);
         System.Assert.areEqual(nonIgnoredTopLevelClassLineNumber, stackTrace.apexCodeLineNumber);
@@ -114,13 +128,32 @@ private class LoggerStackTrace_Tests {
     }
 
     @IsTest
+    static void it_should_set_details_for_trigger_apex_stack_trace_string() {
+        String expectedOriginLocation = 'SomeTrigger';
+        String mockAnonymousApexStackTraceString = 'Trigger.SomeTrigger: line 9, column 1';
+
+        LoggerStackTrace stackTrace = new LoggerStackTrace(mockAnonymousApexStackTraceString);
+
+        System.Assert.areEqual(APEX_SOURCE_TYPE_TRIGGER, stackTrace.apexSourceType);
+        System.Assert.areEqual(expectedOriginLocation, stackTrace.apexTriggerName);
+        System.Assert.isNull(stackTrace.apexTopLevelClassName);
+        System.Assert.isNull(stackTrace.apexInnerClassName);
+        System.Assert.areEqual(9, stackTrace.apexCodeLineNumber);
+        System.Assert.isNull(stackTrace.apexMethodName);
+        System.Assert.areEqual(expectedOriginLocation, stackTrace.originLocation);
+        System.Assert.areEqual(mockAnonymousApexStackTraceString, stackTrace.parsedStackTraceString);
+    }
+
+    @IsTest
     static void it_should_set_details_for_anonymous_apex_stack_trace_string() {
         String expectedOriginLocation = 'AnonymousBlock';
         String mockAnonymousApexStackTraceString = 'AnonymousBlock: line 9, column 1';
 
         LoggerStackTrace stackTrace = new LoggerStackTrace(mockAnonymousApexStackTraceString);
 
-        System.Assert.areEqual(expectedOriginLocation, stackTrace.apexTopLevelClassName);
+        System.Assert.areEqual(APEX_SOURCE_TYPE_ANONYMOUS_BLOCK, stackTrace.apexSourceType);
+        System.Assert.isNull(stackTrace.apexTriggerName);
+        System.Assert.isNull(stackTrace.apexTopLevelClassName);
         System.Assert.isNull(stackTrace.apexInnerClassName);
         System.Assert.areEqual(9, stackTrace.apexCodeLineNumber);
         System.Assert.isNull(stackTrace.apexMethodName);
@@ -130,17 +163,18 @@ private class LoggerStackTrace_Tests {
 
     @IsTest
     static void it_should_deduplicate_sequential_lines_in_stack_trace_string() {
-        String anonymousApexOriginLocation = 'AnonymousBlock';
         String deduplicatedStackTraceString = 'AnonymousBlock: line 9, column 1';
         String duplicatedStackTraceString = deduplicatedStackTraceString + '\n' + deduplicatedStackTraceString + '\n' + deduplicatedStackTraceString;
 
         LoggerStackTrace stackTrace = new LoggerStackTrace(duplicatedStackTraceString);
 
-        System.Assert.areEqual(anonymousApexOriginLocation, stackTrace.apexTopLevelClassName);
+        System.Assert.areEqual(APEX_SOURCE_TYPE_ANONYMOUS_BLOCK, stackTrace.apexSourceType);
+        System.Assert.isNull(stackTrace.apexTriggerName);
+        System.Assert.isNull(stackTrace.apexTopLevelClassName);
         System.Assert.isNull(stackTrace.apexInnerClassName);
         System.Assert.areEqual(9, stackTrace.apexCodeLineNumber);
         System.Assert.isNull(stackTrace.apexMethodName);
-        System.Assert.areEqual(anonymousApexOriginLocation, stackTrace.originLocation);
+        System.Assert.areEqual(APEX_SOURCE_TYPE_ANONYMOUS_BLOCK, stackTrace.originLocation);
         System.Assert.areEqual(deduplicatedStackTraceString, stackTrace.parsedStackTraceString);
     }
 
@@ -150,6 +184,8 @@ private class LoggerStackTrace_Tests {
 
         LoggerStackTrace stackTrace = new LoggerStackTrace(emptyParenthesisStackTrace);
 
+        System.Assert.isNull(stackTrace.apexSourceType);
+        System.Assert.isNull(stackTrace.apexTriggerName);
         System.Assert.isNull(stackTrace.apexTopLevelClassName);
         System.Assert.isNull(stackTrace.apexInnerClassName);
         System.Assert.isNull(stackTrace.apexCodeLineNumber);
@@ -164,6 +200,8 @@ private class LoggerStackTrace_Tests {
 
         LoggerStackTrace stackTrace = new LoggerStackTrace(namespacedPparenthesisStackTrace);
 
+        System.Assert.isNull(stackTrace.apexSourceType);
+        System.Assert.isNull(stackTrace.apexTriggerName);
         System.Assert.isNull(stackTrace.apexTopLevelClassName);
         System.Assert.isNull(stackTrace.apexInnerClassName);
         System.Assert.isNull(stackTrace.apexCodeLineNumber);

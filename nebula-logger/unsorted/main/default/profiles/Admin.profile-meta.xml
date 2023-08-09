@@ -1765,17 +1765,17 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>LogEntry__c.ApexClassApiVersion__c</field>
+        <field>LogEntry__c.OriginSourceApiVersion__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>LogEntry__c.ApexClassCreatedDate__c</field>
+        <field>LogEntry__c.OriginSourceCreatedDate__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>LogEntry__c.ApexClassId__c</field>
+        <field>LogEntry__c.OriginSourceId__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

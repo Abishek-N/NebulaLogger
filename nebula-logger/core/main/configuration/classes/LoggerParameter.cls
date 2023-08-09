@@ -150,6 +150,21 @@ public class LoggerParameter {
     }
 
     /**
+     * @description Controls if Nebula Logger queries `ApexTrigger` data.
+     *              When set to `false`, any `ApexTrigger` fields on `LogEntryEvent__e` and `Log__c` will not be populated
+     *              Controlled by the custom metadata record `LoggerParameter.QueryApexTriggerData`, or `true` as the default
+     */
+    public static final Boolean QUERY_APEX_TRIGGER_DATA {
+        get {
+            if (QUERY_APEX_TRIGGER_DATA == null) {
+                QUERY_APEX_TRIGGER_DATA = getBoolean('QueryApexTriggerData', true);
+            }
+            return QUERY_APEX_TRIGGER_DATA;
+        }
+        private set;
+    }
+
+    /**
      * @description Controls if Nebula Logger queries `AuthSession` data.
      *              When set to `false`, any `AuthSession` fields on `LogEntryEvent__e` and `Log__c` will not be populated
      *              Controlled by the custom metadata record `LoggerParameter.QueryAuthSessionData`, or `true` as the default

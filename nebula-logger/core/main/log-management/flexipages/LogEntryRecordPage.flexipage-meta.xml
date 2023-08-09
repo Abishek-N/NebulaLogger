@@ -894,7 +894,7 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ApexCodeLineNumber__c</fieldItem>
+                <fieldItem>Record.OriginSourceLineNumber__c</fieldItem>
                 <identifier>RecordApexCodeLineNumber_cField</identifier>
             </fieldInstance>
         </itemInstances>
@@ -904,8 +904,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ApexClassApiVersion__c</fieldItem>
-                <identifier>RecordApexClassApiVersion__cField</identifier>
+                <fieldItem>Record.OriginSourceApiVersion__c</fieldItem>
+                <identifier>RecordOriginSourceApiVersion__cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-eb0dd886-ca25-4094-b405-b0653a844c4c</name>

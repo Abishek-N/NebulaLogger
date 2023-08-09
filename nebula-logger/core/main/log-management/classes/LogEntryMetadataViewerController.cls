@@ -23,25 +23,26 @@ public without sharing class LogEntryMetadataViewerController {
 
         LogEntry__c logEntry = LogManagementDataSelector.getInstance().getLogEntryById(recordId);
 
-        if (logEntry.ApexClassName__c == null && logEntry.ExceptionApexClassName__c == null) {
+        Boolean hasExceptionApexClass = logEntry.ExceptionSourceType__c == 'ApexClass' && logEntry.ExceptionSourceApiName__c != null;
+        if (logEntry.ApexClassName__c == null && hasExceptionApexClass == false) {
             return metadata;
         }
 
-        List<String> apexClassNames = new List<String>{ logEntry.ApexClassName__c, logEntry.ExceptionApexClassName__c };
-        Map<String, ApexClass> apexClassNameToClass = new Map<String, ApexClass>();
-        for (ApexClass apexClass : LogManagementDataSelector.getInstance().getApexClasses(apexClassNames)) {
+        List<String> apexClassNames = new List<String>{ logEntry.ApexClassName__c, logEntry.ExceptionSourceApiName__c };
+        Map<String, Schema.ApexClass> apexClassNameToClass = new Map<String, Schema.ApexClass>();
+        for (Schema.ApexClass apexClass : LogManagementDataSelector.getInstance().getApexClasses(apexClassNames)) {
             apexClassNameToClass.put(apexClass.Name, apexClass);
         }
 
         if (apexClassNameToClass.containsKey(logEntry.ApexClassName__c) == true) {
-            ApexClass matchingApexClass = apexClassNameToClass.get(logEntry.ApexClassName__c);
-            metadata.originApexClassCode = matchingApexClass?.Body;
-            metadata.hasOriginApexClassBeenModified = matchingApexClass?.LastModifiedDate > logEntry.Timestamp__c;
+            Schema.ApexClass matchingApexClass = apexClassNameToClass.get(logEntry.ApexClassName__c);
+            metadata.originApexClassCode = matchingApexClass.Body;
+            metadata.hasOriginApexClassBeenModified = matchingApexClass.LastModifiedDate > logEntry.Timestamp__c;
         }
-        if (logEntry.ExceptionApexClassName__c != null) {
-            ApexClass matchingApexClass = apexClassNameToClass.get(logEntry.ExceptionApexClassName__c);
-            metadata.exceptionApexClassCode = matchingApexClass?.Body;
-            metadata.hasExceptionApexClassBeenModified = matchingApexClass?.LastModifiedDate > logEntry.Timestamp__c;
+        if (hasExceptionApexClass == true && apexClassNameToClass.containsKey(logEntry.ExceptionSourceApiName__c) == true) {
+            Schema.ApexClass matchingApexClass = apexClassNameToClass.get(logEntry.ExceptionSourceApiName__c);
+            metadata.exceptionApexClassCode = matchingApexClass.Body;
+            metadata.hasExceptionApexClassBeenModified = matchingApexClass.LastModifiedDate > logEntry.Timestamp__c;
         }
 
         return metadata;

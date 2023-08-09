@@ -34,7 +34,7 @@ private class LogManagementDataSelector_Tests {
     static void it_returns_matching_apex_classes_for_specified_class_names() {
         List<String> targetApexClassNames = new List<String>{ Logger.class.getName(), LogEntryEventBuilder.class.getName() };
         List<ApexClass> expectedResults = [
-            SELECT ApiVersion, Body, CreatedById, CreatedDate, Id, LastModifiedById, LastModifiedDate, Name
+            SELECT ApiVersion, Body, CreatedById, CreatedBy.Username, CreatedDate, Id, LastModifiedById, LastModifiedBy.Username, LastModifiedDate, Name
             FROM ApexClass
             WHERE Name IN :targetApexClassNames
             ORDER BY NamespacePrefix NULLS LAST
@@ -53,6 +53,34 @@ private class LogManagementDataSelector_Tests {
         LoggerParameter.setMock(new LoggerParameter__mdt(DeveloperName = 'QueryApexClassData', Value__c = String.valueOf(false)));
 
         List<ApexClass> returnedResults = LogManagementDataSelector.getInstance().getApexClasses(targetApexClassNames);
+
+        System.Assert.areEqual(originalQueryCount, System.Limits.getQueries());
+        System.Assert.areEqual(0, returnedResults.size());
+    }
+
+    @IsTest
+    static void it_returns_matching_apex_triggers_for_specified_class_names() {
+        List<String> targetApexTriggerNames = new List<String>{ Logger.class.getName(), LogEntryEventBuilder.class.getName() };
+        List<ApexTrigger> expectedResults = [
+            SELECT ApiVersion, Body, CreatedById, CreatedBy.Username, CreatedDate, Id, LastModifiedById, LastModifiedBy.Username, LastModifiedDate, Name
+            FROM ApexTrigger
+            WHERE Name IN :targetApexTriggerNames
+            ORDER BY NamespacePrefix NULLS LAST
+        ];
+
+        List<ApexTrigger> returnedResults = LogManagementDataSelector.getInstance().getApexTriggers(targetApexTriggerNames);
+
+        System.Assert.areEqual(expectedResults, returnedResults);
+    }
+
+    @IsTest
+    static void it_does_not_query_apex_triggers_when_disabled_via_logger_parameter() {
+        // The trigger names used in the query don't particularly matter here - the main concern is checking that the query does not execute at all
+        List<String> targetApexTriggerNames = new List<String>{ 'SomeTrigger', 'AnotherTrigger' };
+        Integer originalQueryCount = System.Limits.getQueries();
+        LoggerParameter.setMock(new LoggerParameter__mdt(DeveloperName = 'QueryApexTriggerData', Value__c = String.valueOf(false)));
+
+        List<ApexTrigger> returnedResults = LogManagementDataSelector.getInstance().getApexTriggers(targetApexTriggerNames);
 
         System.Assert.areEqual(originalQueryCount, System.Limits.getQueries());
         System.Assert.areEqual(0, returnedResults.size());

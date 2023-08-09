@@ -103,17 +103,17 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Readonly</behavior>
-                <field>ApexClassApiVersion__c</field>
+                <field>OriginSourceApiVersion__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>
                 <behavior>Readonly</behavior>
-                <field>ApexClassId__c</field>
+                <field>OriginSourceId__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Readonly</behavior>
-                <field>ApexClassCreatedDate__c</field>
+                <field>OriginSourceCreatedDate__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Readonly</behavior>

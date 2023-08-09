@@ -96,7 +96,8 @@ private class LogEntryMetadataViewerController_Tests {
     static LogEntry__c createLogEntry(Id logId, ApexClass originApexClass, ApexClass exceptionApexClass) {
         LogEntry__c logEntry = (LogEntry__c) LoggerMockDataCreator.createDataBuilder(Schema.LogEntry__c.SObjectType).populateRequiredFields().getRecord();
         logEntry.ApexClassName__c = originApexClass?.Name;
-        logEntry.ExceptionApexClassName__c = exceptionApexClass?.Name;
+        logEntry.ExceptionSourceType__c = exceptionApexClass == null ? null : 'ApexClass';
+        logEntry.ExceptionSourceApiName__c = exceptionApexClass?.Name;
         logEntry.Log__c = logId;
         logEntry.Timestamp__c = System.now();
         return logEntry;

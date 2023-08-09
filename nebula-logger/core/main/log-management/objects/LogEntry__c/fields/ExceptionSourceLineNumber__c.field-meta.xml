@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>HasApexCodeSnippet__c</fullName>
+    <fullName>ExceptionSourceLineNumber__c</fullName>
     <businessStatus>Active</businessStatus>
     <complianceGroup>None</complianceGroup>
-    <defaultValue>false</defaultValue>
     <externalId>false</externalId>
-    <label>Has Apex Code Snippet</label>
+    <inlineHelpText>The line number of the source code that generated the exception</inlineHelpText>
+    <label>Exception Source Code Line Number</label>
+    <precision>10</precision>
+    <required>false</required>
+    <scale>0</scale>
     <securityClassification>Confidential</securityClassification>
     <trackFeedHistory>false</trackFeedHistory>
     <trackTrending>false</trackTrending>
-    <type>Checkbox</type>
+    <type>Number</type>
+    <unique>false</unique>
 </CustomField>

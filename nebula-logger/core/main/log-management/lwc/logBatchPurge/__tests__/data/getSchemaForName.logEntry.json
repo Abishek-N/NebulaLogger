@@ -13,24 +13,24 @@
         "LastViewedDate": { "apiName": "LastViewedDate", "label": "Last Viewed Date", "localApiName": "LastViewedDate", "type": "datetime" },
         "LastReferencedDate": { "apiName": "LastReferencedDate", "label": "Last Referenced Date", "localApiName": "LastReferencedDate", "type": "datetime" },
         "Log__c": { "apiName": "Log__c", "label": "Log", "localApiName": "Log__c", "type": "reference" },
-        "ApexClassApiVersion__c": {
-            "apiName": "ApexClassApiVersion__c",
+        "OriginSourceApiVersion__c": {
+            "apiName": "OriginSourceApiVersion__c",
             "inlineHelpText": "The API version for this class. Every class has an API version specified at creation.",
             "label": "Apex Class API Version",
-            "localApiName": "ApexClassApiVersion__c",
+            "localApiName": "OriginSourceApiVersion__c",
             "type": "picklist"
         },
-        "ApexClassCreatedDate__c": {
-            "apiName": "ApexClassCreatedDate__c",
+        "OriginSourceCreatedDate__c": {
+            "apiName": "OriginSourceCreatedDate__c",
             "label": "Apex Class Created Date",
-            "localApiName": "ApexClassCreatedDate__c",
+            "localApiName": "OriginSourceCreatedDate__c",
             "type": "datetime"
         },
-        "ApexClassId__c": {
-            "apiName": "ApexClassId__c",
+        "OriginSourceId__c": {
+            "apiName": "OriginSourceId__c",
             "inlineHelpText": "The ID of the Apex class in the current org.",
             "label": "Apex Class ID",
-            "localApiName": "ApexClassId__c",
+            "localApiName": "OriginSourceId__c",
             "type": "string"
         },
         "ApexClassLastModifiedDate__c": {
