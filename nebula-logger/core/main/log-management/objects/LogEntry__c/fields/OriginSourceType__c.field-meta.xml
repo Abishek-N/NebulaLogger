@@ -15,21 +15,23 @@
             <sorted>false</sorted>
             <value>
                 <fullName>AnonymousBlock</fullName>
-                <color>#333333</color>
                 <default>false</default>
                 <label>AnonymousBlock</label>
             </value>
             <value>
                 <fullName>ApexClass</fullName>
-                <color>#A845DC</color>
                 <default>false</default>
                 <label>ApexClass</label>
             </value>
             <value>
                 <fullName>ApexTrigger</fullName>
-                <color>#FFCC33</color>
                 <default>false</default>
                 <label>ApexTrigger</label>
+            </value>
+            <value>
+                <fullName>Flow</fullName>
+                <default>false</default>
+                <label>Flow</label>
             </value>
         </valueSetDefinition>
     </valueSet>

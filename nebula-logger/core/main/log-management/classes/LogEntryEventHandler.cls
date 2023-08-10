@@ -317,6 +317,8 @@ public without sharing class LogEntryEventHandler extends LoggerSObjectHandler {
                 MessageTruncated__c = logEntryEvent.MessageTruncated__c,
                 Name = null, // Salesforce will auto-set the record ID as the name when null
                 OriginLocation__c = logEntryEvent.OriginLocation__c,
+                OriginSourceApiName__c = logEntryEvent.OriginSourceApiName__c,
+                OriginSourceType__c = logEntryEvent.OriginSourceType__c,
                 OriginType__c = logEntryEvent.OriginType__c,
                 RecordCollectionSize__c = logEntryEvent.RecordCollectionSize__c,
                 RecordCollectionType__c = logEntryEvent.RecordCollectionType__c,

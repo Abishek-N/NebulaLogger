@@ -28,12 +28,23 @@ private class LogEntryHandler_Tests_Flow {
         System.Assert.isNull(logEntry.FlowLastModifiedDate__c);
         System.Assert.isNull(logEntry.FlowProcessType__c);
         System.Assert.isNull(logEntry.FlowRecordTriggerType__c);
-        System.Assert.isNull(logEntry.FlowTriggerSObjectType__c);
         System.Assert.isNull(logEntry.FlowTriggerOrder__c);
+        System.Assert.isNull(logEntry.FlowTriggerSObjectType__c);
         System.Assert.isNull(logEntry.FlowTriggerType__c);
         System.Assert.isNull(logEntry.FlowVersionApiVersionRuntime__c);
         System.Assert.isNull(logEntry.FlowVersionNumber__c);
         System.Assert.isNull(logEntry.FlowVersionRunInMode__c);
+        System.Assert.isNull(logEntry.OriginLocation__c);
+        System.Assert.isNull(logEntry.OriginSourceApiName__c);
+        System.Assert.isNull(logEntry.OriginSourceApiVersion__c);
+        System.Assert.isNull(logEntry.OriginSourceCreatedByUsername__c);
+        System.Assert.isNull(logEntry.OriginSourceCreatedDate__c);
+        System.Assert.isNull(logEntry.OriginSourceId__c);
+        System.Assert.isNull(logEntry.OriginSourceLastModifiedByUsername__c);
+        System.Assert.isNull(logEntry.OriginSourceLastModifiedDate__c);
+        System.Assert.isNull(logEntry.OriginSourceLineNumber__c);
+        System.Assert.isNull(logEntry.OriginSourceSnippet__c);
+        System.Assert.isNull(logEntry.OriginSourceType__c);
     }
 
     @IsTest
@@ -66,8 +77,20 @@ private class LogEntryHandler_Tests_Flow {
             logEntry.FlowVersionApiVersionRuntime__c,
             'FlowVersionApiVersionRuntime was incorrect.'
         );
-        System.Assert.areEqual(flowVersion.RunInMode, logEntry.FlowVersionRunInMode__c, 'FlowVersionRunInMode was incorrect.');
-        System.Assert.areEqual(flowVersion.VersionNumber, logEntry.FlowVersionNumber__c, 'FlowVersionNumber was incorrect.');
+        System.Assert.areEqual(flowVersion.RunInMode, logEntry.FlowVersionRunInMode__c);
+        System.Assert.areEqual(flowVersion.VersionNumber, logEntry.FlowVersionNumber__c);
+
+        // System.Assert.areEqual(flowDefinitionView.ActiveVersionIdlogEntry.OriginLocation__c
+// logEntry.OriginSourceApiName__c
+// logEntry.OriginSourceApiVersion__c
+// logEntry.OriginSourceCreatedByUsername__c
+// logEntry.OriginSourceCreatedDate__c
+// logEntry.OriginSourceId__c
+// logEntry.OriginSourceLastModifiedByUsername__c
+// logEntry.OriginSourceLastModifiedDate__c
+// logEntry.OriginSourceLineNumber__c
+// logEntry.OriginSourceSnippet__c
+// logEntry.OriginSourceType__c
     }
 
     private static LogEntry__c getLogEntry() {

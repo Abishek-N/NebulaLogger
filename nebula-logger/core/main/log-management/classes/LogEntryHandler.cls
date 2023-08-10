@@ -167,8 +167,8 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
         List<String> flowApiNames = new List<String>();
         List<LogEntry__c> flowLogEntries = new List<LogEntry__c>();
         for (LogEntry__c logEntry : logEntries) {
-            if (logEntry.OriginType__c == 'Flow' && String.isNotBlank(logEntry.OriginLocation__c)) {
-                flowApiNames.add(logEntry.OriginLocation__c);
+            if (logEntry.OriginType__c == 'Flow' && String.isNotBlank(logEntry.OriginSourceApiName__c)) {
+                flowApiNames.add(logEntry.OriginSourceApiName__c);
                 flowLogEntries.add(logEntry);
             }
         }
@@ -187,7 +187,7 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
         }
 
         for (LogEntry__c logEntry : flowLogEntries) {
-            FlowDefinitionView flowDefinition = flowApiNameToDefinition.get(logEntry.OriginLocation__c);
+            FlowDefinitionView flowDefinition = flowApiNameToDefinition.get(logEntry.OriginSourceApiName__c);
             if (flowDefinition == null) {
                 continue;
             }
@@ -203,6 +203,13 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
             logEntry.FlowTriggerOrder__c = flowDefinition.TriggerOrder;
             logEntry.FlowTriggerSObjectType__c = flowDefinition.TriggerObjectOrEvent?.QualifiedApiName;
             logEntry.FlowTriggerType__c = flowDefinition.TriggerType;
+            // TODO finalize what should go here?!
+            logEntry.OriginSourceId__c = flowDefinition.ActiveVersionId; // flowDefinition.DurableId;
+
+            // logEntry.OriginSourceCreatedByName__c = flowDefinition.CreatedBy;
+            // logEntry.OriginSourceCreatedDate__c = flowDefinition.CreatedDate;
+            // logEntry.OriginSourceLastModifiedByName__c = flowDefinition.LastModifiedBy;
+            // logEntry.OriginSourceLastModifiedDate__c = flowDefinition.LastModifiedDate;
         }
     }
 
@@ -241,6 +248,14 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
             logEntry.FlowVersionApiVersionRuntime__c = 'v' + flowVersionView.ApiVersionRuntime + '.0';
             logEntry.FlowVersionRunInMode__c = flowVersionView.RunInMode;
             logEntry.FlowVersionNumber__c = flowVersionView.VersionNumber;
+
+            logEntry.OriginSourceApiVersion__c =  'v' + flowVersionView.ApiVersionRuntime + '.0';
+            // TODO populate these
+            // logEntry.OriginSourceCreatedByUsername__c = flowVersionView.CreatedBy.Username;
+            // logEntry.OriginSourceCreatedDate__c = flowVersionView.CreatedDate;
+            // logEntry.OriginSourceId__c
+            // logEntry.OriginSourceLastModifiedByUsername__c = flowVersionView.LastModifiedBy.Username;
+            // logEntry.OriginSourceLastModifiedDate__c = flowVersionView.LastModifiedDate;
         }
     }
 
@@ -503,12 +518,13 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
                 return;
             }
 
+            logEntry.ApexClassLastModifiedDate__c = apexClass.LastModifiedDate;
             logEntry.OriginSourceApiVersion__c = 'v' + apexClass.ApiVersion;
             logEntry.OriginSourceCreatedByUsername__c = apexClass.CreatedBy.Username;
             logEntry.OriginSourceCreatedDate__c = apexClass.CreatedDate;
             logEntry.OriginSourceId__c = apexClass.Id;
             logEntry.OriginSourceLastModifiedByUsername__c = apexClass.LastModifiedBy.Username;
-            logEntry.ApexClassLastModifiedDate__c = apexClass.LastModifiedDate;
+            logEntry.OriginSourceLastModifiedDate__c = apexClass.LastModifiedDate;
             logEntry.OriginSourceSnippet__c = JSON.serializePretty(new ApexCodeSnippet(apexClass, Integer.valueOf(codeLineNumber)));
         }
 

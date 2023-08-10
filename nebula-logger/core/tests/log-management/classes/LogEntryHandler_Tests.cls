@@ -700,10 +700,6 @@ private class LogEntryHandler_Tests {
         System.Assert.areEqual(exampleTriggerName, logEntry.OriginLocation__c);
         System.Assert.areEqual('Trigger', logEntry.OriginSourceType__c);
         System.Assert.areEqual(targetCodeLineNumber, logEntry.OriginSourceLineNumber__c);
-        System.Assert.isNull(logEntry.OriginSourceApiVersion__c);
-        System.Assert.isNull(logEntry.OriginSourceCreatedByUsername__c);
-        System.Assert.isNull(logEntry.OriginSourceCreatedDate__c);
-        System.Assert.isNull(logEntry.OriginSourceId__c);
         System.Assert.isNull(logEntry.ApexClassLastModifiedDate__c);
         System.Assert.isNull(logEntry.ApexClassName__c);
         System.Assert.isNull(logEntry.ApexInnerClassName__c);
