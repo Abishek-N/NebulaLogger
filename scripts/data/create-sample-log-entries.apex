@@ -4,7 +4,7 @@ Logger.getUserSettings().DefaultSaveMethod__c = Logger.SaveMethod.EVENT_BUS.name
 // Logger.getUserSettings().IsAnonymousModeEnabled__c = true;
 // Logger.getUserSettings().DefaultPlatformEventStorageLocation__c = 'BIG_OBJECT';
 // Logger.getUserSettings().DefaultPlatformEventStorageLocation__c = 'CUSTOM_OBJECTS';
-upsert Logger.getUserSettings();
+// upsert Logger.getUserSettings();
 
 Logger.setScenario('an example transaction scenario name');
 Logger.getUserSettings().LoggingLevel__c = System.LoggingLevel.FINEST.name();

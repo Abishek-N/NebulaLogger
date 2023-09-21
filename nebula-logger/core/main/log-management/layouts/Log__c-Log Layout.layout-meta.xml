@@ -373,7 +373,7 @@
         <fields>Origin__c</fields>
         <fields>Message__c</fields>
         <fields>RecordDetailedLink__c</fields>
-        <fields>EntryScenarioLink__c</fields>
+        <fields>ExceptionType__c</fields>
         <fields>LoggingLevelWithImage__c</fields>
         <fields>TransactionEntryNumber__c</fields>
         <relatedList>LogEntry__c.Log__c</relatedList>

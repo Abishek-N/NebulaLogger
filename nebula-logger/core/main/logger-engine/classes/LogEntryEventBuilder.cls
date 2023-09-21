@@ -731,6 +731,7 @@ global with sharing class LogEntryEventBuilder {
 
     private LogEntryEventBuilder setStackTraceDetails(LoggerStackTrace stackTrace) {
         this.logEntryEvent.OriginLocation__c = stackTrace.originLocation;
+        this.logEntryEvent.OriginSourceType__c = stackTrace.originSourceType;
         this.logEntryEvent.StackTrace__c = truncateFieldValue(Schema.LogEntryEvent__e.StackTrace__c, stackTrace.parsedStackTraceString);
         return this;
     }

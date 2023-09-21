@@ -46,6 +46,8 @@ public with sharing class ExampleClassWithLogging {
          */
         public void doAnInnerSomething() {
             Logger.info('running doAnInnerSomething() method!');
+            Logger.warn('logging some exception', new System.DmlException('oops'));
+            Logger.info('test logging of a stack trace: ' + JSON.serializePretty(new LoggerStackTrace()));
         }
     }
 }

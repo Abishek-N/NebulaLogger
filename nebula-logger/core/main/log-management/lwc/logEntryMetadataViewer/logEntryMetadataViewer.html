@@ -43,6 +43,7 @@
                                 target-line-number={originApexCodeSnippet.targetLineNumber}
                             >
                                 <span slot="title">{originApexCodeSnippet.title}</span>
+                                // TODO add support for ApexTrigger
                                 <template if:true={hasFullOriginApexClass}>
                                     <span slot="actions">
                                         <lightning-button
@@ -95,6 +96,7 @@
                                     target-line-number={exceptionApexCodeSnippet.targetLineNumber}
                                 >
                                     <span slot="title">{exceptionApexCodeSnippet.title}</span>
+                                    // TODO add support for ApexTrigger
                                     <template if:true={hasFullExceptionApexClass}>
                                         <span slot="actions">
                                             <lightning-button

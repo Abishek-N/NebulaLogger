@@ -13,6 +13,7 @@ const ComponentLogEntry = class {
     browserUserAgent = null;
     browserWindowResolution = null;
     error = null;
+    isConsoleLoggingEnabled = false;
     loggingLevel = null;
     message = null;
     record = null;

@@ -5,20 +5,22 @@
 
 import { LightningElement, api } from 'lwc';
 
-const SECTION_ICON_EXPANDED = 'utility:chevrondown';
-const SECTION_ICON_COLLAPSED = 'utility:chevronright';
-
 export default class LoggerPageSection extends LightningElement {
     @api title;
-    @api content;
 
-    showContent = true;
+    _showContent = true;
+
+    get sectionToggleClass() {
+        const classNames = ['slds-section__content'];
+        classNames.push(this._showContent ? 'slds-show' : 'slds-hide');
+        return classNames.join(' ');
+    }
 
     get sectionToggleIcon() {
-        return this.showContent ? SECTION_ICON_EXPANDED : SECTION_ICON_COLLAPSED;
+        return this._showContent ? 'utility:chevrondown' : 'utility:chevronright';
     }
 
     toggleSection() {
-        this.showContent = !this.showContent;
+        this._showContent = !this._showContent;
     }
 }

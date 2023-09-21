@@ -16,6 +16,12 @@ trigger Account_Trigger_Logger_Example on Account(before insert, before update, 
         Logger.fine('Here\'s an entry for a specific Account record', account);
     }
 
+    // Example of logging an exception
+    Logger.warn('logging some exception', new System.CalloutException('server is b0rked'));
+
+    // Also call a handler class just to really make this some spaghetti-code 🍝
+    new Account_Trigger_Handler_Logger_Example().execute();
+
     // Save any pending log entries
     Logger.saveLog();
 }

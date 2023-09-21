@@ -8,22 +8,26 @@ import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
 import getMetadata from '@salesforce/apex/LogEntryMetadataViewerController.getMetadata';
 
 import LOG_ENTRY_OBJECT from '@salesforce/schema/LogEntry__c';
-import EXCEPTION_SOURCE_CODE_SNIPPET_FIELD from '@salesforce/schema/LogEntry__c.ExceptionSourceSnippet__c';
-import EXCEPTION_SOURCE_NAME_FIELD from '@salesforce/schema/LogEntry__c.ExceptionSourceApiName__c';
+import EXCEPTION_SOURCE_API_NAME_FIELD from '@salesforce/schema/LogEntry__c.ExceptionSourceApiName__c';
+import EXCEPTION_SOURCE_SNIPPET_FIELD from '@salesforce/schema/LogEntry__c.ExceptionSourceSnippet__c';
+import EXCEPTION_SOURCE_TYPE_FIELD from '@salesforce/schema/LogEntry__c.ExceptionSourceType__c';
 import EXCEPTION_TYPE_FIELD from '@salesforce/schema/LogEntry__c.ExceptionType__c';
 import MESSAGE_MASKED_FIELD from '@salesforce/schema/LogEntry__c.MessageMasked__c';
 import MESSAGE_TRUNCATED_FIELD from '@salesforce/schema/LogEntry__c.MessageTruncated__c';
 import ORIGIN_SOURCE_API_NAME_FIELD from '@salesforce/schema/LogEntry__c.OriginSourceApiName__c';
-import ORIGIN_SOURCE_CODE_SNIPPET_FIELD from '@salesforce/schema/LogEntry__c.OriginSourceSnippet__c';
+import ORIGIN_SOURCE_SNIPPET_FIELD from '@salesforce/schema/LogEntry__c.OriginSourceSnippet__c';
+import ORIGIN_SOURCE_TYPE_FIELD from '@salesforce/schema/LogEntry__c.OriginSourceType__c';
 
 const LOG_ENTRY_FIELDS = [
-    EXCEPTION_SOURCE_CODE_SNIPPET_FIELD,
-    EXCEPTION_SOURCE_NAME_FIELD,
+    EXCEPTION_SOURCE_API_NAME_FIELD,
+    EXCEPTION_SOURCE_SNIPPET_FIELD,
+    EXCEPTION_SOURCE_TYPE_FIELD,
     EXCEPTION_TYPE_FIELD,
     MESSAGE_MASKED_FIELD,
     MESSAGE_TRUNCATED_FIELD,
     ORIGIN_SOURCE_API_NAME_FIELD,
-    ORIGIN_SOURCE_CODE_SNIPPET_FIELD
+    ORIGIN_SOURCE_SNIPPET_FIELD,
+    ORIGIN_SOURCE_TYPE_FIELD
 ];
 
 export default class LogEntryMetadataViewer extends LightningElement {
@@ -90,20 +94,40 @@ export default class LogEntryMetadataViewer extends LightningElement {
     wiredGetLogEntry({ data }) {
         if (data) {
             this._logEntry = data;
-            const originApexCodeSnippetJson = getFieldValue(this._logEntry, ORIGIN_SOURCE_CODE_SNIPPET_FIELD);
+            const originApexCodeSnippetJson = getFieldValue(this._logEntry, ORIGIN_SOURCE_SNIPPET_FIELD);
             if (originApexCodeSnippetJson) {
-                // TODO add logic to set the extension based on OriginSourceType__c
-                // const sourceExtension =
-                const sourceName = getFieldValue(this._logEntry, ORIGIN_SOURCE_API_NAME_FIELD) + '.cls';
+                const sourceType = getFieldValue(this._logEntry, ORIGIN_SOURCE_TYPE_FIELD);
+                let sourceExtension;
+                switch (sourceType) {
+                    case 'ApexClass':
+                        sourceExtension = '.cls';
+                        break;
+                    case 'ApexTrigger':
+                        sourceExtension = '.trigger';
+                        break;
+                    default:
+                        sourceExtension = '';
+                }
+                const sourceName = getFieldValue(this._logEntry, ORIGIN_SOURCE_API_NAME_FIELD) + sourceExtension;
                 this.originApexCodeSnippet = { ...JSON.parse(originApexCodeSnippetJson), ...{ language: 'apex', title: sourceName } };
             }
 
             if (this.showExceptionDetails) {
-                const exceptionApexCodeSnippetJson = getFieldValue(this._logEntry, EXCEPTION_SOURCE_CODE_SNIPPET_FIELD);
+                const exceptionApexCodeSnippetJson = getFieldValue(this._logEntry, EXCEPTION_SOURCE_SNIPPET_FIELD);
                 if (exceptionApexCodeSnippetJson) {
-                    // TODO add logic to set the extension based on ExceptionSourceType__c
-                    // const sourceExtension =
-                    const sourceName = getFieldValue(this._logEntry, EXCEPTION_SOURCE_NAME_FIELD) + '.cls';
+                    const sourceType = getFieldValue(this._logEntry, EXCEPTION_SOURCE_TYPE_FIELD);
+                    let sourceExtension;
+                    switch (sourceType) {
+                        case 'ApexClass':
+                            sourceExtension = '.cls';
+                            break;
+                        case 'ApexTrigger':
+                            sourceExtension = '.trigger';
+                            break;
+                        default:
+                            sourceExtension = '';
+                    }
+                    const sourceName = getFieldValue(this._logEntry, EXCEPTION_SOURCE_API_NAME_FIELD) + sourceExtension;
                     this.exceptionApexCodeSnippet = { ...JSON.parse(exceptionApexCodeSnippetJson), ...{ language: 'apex', title: sourceName } };
                 }
             }

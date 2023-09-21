@@ -249,7 +249,7 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
             logEntry.FlowVersionRunInMode__c = flowVersionView.RunInMode;
             logEntry.FlowVersionNumber__c = flowVersionView.VersionNumber;
 
-            logEntry.OriginSourceApiVersion__c =  'v' + flowVersionView.ApiVersionRuntime + '.0';
+            logEntry.OriginSourceApiVersion__c = 'v' + flowVersionView.ApiVersionRuntime + '.0';
             // TODO populate these
             // logEntry.OriginSourceCreatedByUsername__c = flowVersionView.CreatedBy.Username;
             // logEntry.OriginSourceCreatedDate__c = flowVersionView.CreatedDate;
@@ -444,11 +444,12 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
         }
 
         private ApexCodeSnippet(String codeBody, Integer targetLineNumber) {
-            this.targetLineNumber = targetLineNumber;
-
-            List<String> allCodeLines = codeBody.split('\n');
-            this.calculateLineNumbers(allCodeLines.size());
-            this.setCode(allCodeLines);
+            if (String.isNotBlank(codeBody) == true && targetLineNumber != null) {
+                this.targetLineNumber = targetLineNumber;
+                List<String> allCodeLines = codeBody.split('\n');
+                this.calculateLineNumbers(allCodeLines.size());
+                this.setCode(allCodeLines);
+            }
         }
 
         private void calculateLineNumbers(Integer numberOfCodeLines) {
@@ -553,7 +554,7 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
     @SuppressWarnings('PMD.ApexDoc')
     private class ExceptionApexStackTraceFieldApplier extends ApexStackTraceFieldApplier {
         public override void apply(LogEntry__c logEntry, LoggerStackTrace stackTrace) {
-            logEntry.ExceptionSourceType__c = stackTrace.apexSourceType;
+            logEntry.ExceptionSourceType__c = stackTrace.originSourceType;
             logEntry.ExceptionSourceLineNumber__c = stackTrace.apexCodeLineNumber;
             logEntry.ExceptionSourceApiName__c = String.isNotBlank(stackTrace.apexTopLevelClassName) == true
                 ? stackTrace.apexTopLevelClassName
@@ -567,10 +568,9 @@ public without sharing class LogEntryHandler extends LoggerSObjectHandler {
             logEntry.ApexClassName__c = stackTrace.apexTopLevelClassName;
             logEntry.ApexInnerClassName__c = stackTrace.apexInnerClassName;
             logEntry.ApexMethodName__c = stackTrace.apexMethodName;
-            logEntry.OriginSourceApiName__c = stackTrace.apexTriggerName;
-            logEntry.OriginSourceApiName__c = stackTrace.apexTopLevelClassName;
+            logEntry.OriginSourceApiName__c = stackTrace.originSourceApiName;
             logEntry.OriginSourceLineNumber__c = stackTrace.apexCodeLineNumber;
-            logEntry.OriginSourceType__c = stackTrace.apexSourceType;
+            logEntry.OriginSourceType__c = stackTrace.originSourceType;
         }
     }
 

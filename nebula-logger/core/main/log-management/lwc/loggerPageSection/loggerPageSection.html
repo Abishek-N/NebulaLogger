@@ -14,13 +14,13 @@
                     </span>
                 </button>
             </h3>
-            <template if:true={showContent}>
+            <div class={sectionToggleClass}>
                 <lightning-layout class="slds-p-around_medium">
                     <lightning-layout-item size="12">
-                        <slot name="content">{content}</slot>
+                        <slot name="content"></slot>
                     </lightning-layout-item>
                 </lightning-layout>
-            </template>
+            </div>
         </div>
     </lightning-card>
 </template>

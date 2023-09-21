@@ -64,6 +64,8 @@ public without sharing class LogEntryEventHandler extends LoggerSObjectHandler {
     }
 
     private List<LogEntryEvent__e> filterLogEntryEventsToSave(List<LogEntryEvent__e> newLogEntryEvents) {
+        // TODO Consider adding logging throughout code below when system messages param is enabled.
+        // Entries should contain info about why records have been filtered out.
         final String trueString = String.valueOf(true);
         List<LogEntryEvent__e> logEntryEventsToSave = new List<LogEntryEvent__e>();
         for (LogEntryEvent__e logEntryEvent : newLogEntryEvents) {

@@ -46,14 +46,14 @@ describe('c-logger-page-section', () => {
             titleAction.click();
 
             await Promise.resolve('rerender template after button click');
-            contentSlot = element.shadowRoot.querySelector('slot[name="content"]');
+            const contentContainer = element.shadowRoot.querySelector('.slds-section__content');
             const toggleIcon = element.shadowRoot.querySelector('lightning-icon');
             if (isContentExpectedToBeDisplayed) {
                 expect(toggleIcon.iconName).toBe('utility:chevrondown');
-                expect(contentSlot).toBeTruthy();
+                expect(contentContainer.className).not.toContain('slds-hide');
             } else {
                 expect(toggleIcon.iconName).toBe('utility:chevronright');
-                expect(contentSlot).toBeFalsy();
+                expect(contentContainer.className).toContain('slds-hide');
             }
         }
     });

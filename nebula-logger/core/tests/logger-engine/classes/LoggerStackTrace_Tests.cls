@@ -1,9 +1,9 @@
 @SuppressWarnings('PMD.ApexDoc, PMD.MethodNamingConventions')
 @IsTest
 private class LoggerStackTrace_Tests {
-    private final static String APEX_SOURCE_TYPE_ANONYMOUS_BLOCK = 'AnonymousBlock';
-    private final static String APEX_SOURCE_TYPE_CLASS = 'Class';
-    private final static String APEX_SOURCE_TYPE_TRIGGER = 'Trigger';
+    private final static String APEX_SOURCE_TYPE_ANONYMOUS_BLOCK = 'ApexAnonymousBlock';
+    private final static String APEX_SOURCE_TYPE_CLASS = 'ApexClass';
+    private final static String APEX_SOURCE_TYPE_TRIGGER = 'ApexTrigger';
 
     @IsTest
     static void it_should_set_details_for_parameterless_constructor() {
@@ -14,7 +14,8 @@ private class LoggerStackTrace_Tests {
 
         LoggerStackTrace parameterlessStackTrace = new LoggerStackTrace();
 
-        System.Assert.areEqual(APEX_SOURCE_TYPE_CLASS, parameterlessStackTrace.apexSourceType);
+        System.Assert.areEqual(topLevelClassName, parameterlessStackTrace.originSourceApiName);
+        System.Assert.areEqual(APEX_SOURCE_TYPE_CLASS, parameterlessStackTrace.originSourceType);
         System.Assert.isNull(parameterlessStackTrace.apexTriggerName);
         System.Assert.areEqual(topLevelClassName, parameterlessStackTrace.apexTopLevelClassName);
         System.Assert.isNull(parameterlessStackTrace.apexInnerClassName);
@@ -31,7 +32,8 @@ private class LoggerStackTrace_Tests {
 
         LoggerStackTrace exceptionBasedStackTrace = new LoggerStackTrace(apexException);
 
-        System.Assert.areEqual(APEX_SOURCE_TYPE_CLASS, exceptionBasedStackTrace.apexSourceType);
+        System.Assert.areEqual(stringBasedStackTrace.apexTopLevelClassName, exceptionBasedStackTrace.originSourceApiName);
+        System.Assert.areEqual(APEX_SOURCE_TYPE_CLASS, exceptionBasedStackTrace.originSourceType);
         System.Assert.isNull(exceptionBasedStackTrace.apexTriggerName);
         System.Assert.areEqual(stringBasedStackTrace.apexTopLevelClassName, exceptionBasedStackTrace.apexTopLevelClassName);
         System.Assert.areEqual(stringBasedStackTrace.apexInnerClassName, exceptionBasedStackTrace.apexInnerClassName);
@@ -58,7 +60,8 @@ private class LoggerStackTrace_Tests {
 
         LoggerStackTrace stackTrace = new LoggerStackTrace(constructedClass.getStackTraceString());
 
-        System.Assert.areEqual(APEX_SOURCE_TYPE_CLASS, stackTrace.apexSourceType);
+        System.Assert.areEqual(topLevelClassName, stackTrace.originSourceApiName);
+        System.Assert.areEqual(APEX_SOURCE_TYPE_CLASS, stackTrace.originSourceType);
         System.Assert.isNull(stackTrace.apexTriggerName);
         System.Assert.areEqual(topLevelClassName, stackTrace.apexTopLevelClassName);
         System.Assert.areEqual(innerClassName, stackTrace.apexInnerClassName);
@@ -85,7 +88,8 @@ private class LoggerStackTrace_Tests {
 
         LoggerStackTrace stackTrace = new LoggerStackTrace(stackTraceGenerator.getStackTraceString());
 
-        System.Assert.areEqual(APEX_SOURCE_TYPE_CLASS, stackTrace.apexSourceType);
+        System.Assert.areEqual(topLevelClassName, stackTrace.originSourceApiName);
+        System.Assert.areEqual(APEX_SOURCE_TYPE_CLASS, stackTrace.originSourceType);
         System.Assert.isNull(stackTrace.apexTriggerName);
         System.Assert.areEqual(topLevelClassName, stackTrace.apexTopLevelClassName);
         System.Assert.isNull(stackTrace.apexInnerClassName);
@@ -117,7 +121,8 @@ private class LoggerStackTrace_Tests {
         LoggerStackTrace.ignoreOrigin(LoggerStackTrace_Tests.class);
         LoggerStackTrace stackTrace = new LoggerStackTrace(mockStackTrace);
 
-        System.Assert.areEqual(APEX_SOURCE_TYPE_CLASS, stackTrace.apexSourceType);
+        System.Assert.areEqual(nonIgnoredTopLevelClassName, stackTrace.originSourceApiName);
+        System.Assert.areEqual(APEX_SOURCE_TYPE_CLASS, stackTrace.originSourceType);
         System.Assert.isNull(stackTrace.apexTriggerName);
         System.Assert.areEqual(nonIgnoredTopLevelClassName, stackTrace.apexTopLevelClassName);
         System.Assert.isNull(stackTrace.apexInnerClassName);
@@ -134,7 +139,8 @@ private class LoggerStackTrace_Tests {
 
         LoggerStackTrace stackTrace = new LoggerStackTrace(mockAnonymousApexStackTraceString);
 
-        System.Assert.areEqual(APEX_SOURCE_TYPE_TRIGGER, stackTrace.apexSourceType);
+        System.Assert.areEqual(expectedOriginLocation, stackTrace.originSourceApiName);
+        System.Assert.areEqual(APEX_SOURCE_TYPE_TRIGGER, stackTrace.originSourceType);
         System.Assert.areEqual(expectedOriginLocation, stackTrace.apexTriggerName);
         System.Assert.isNull(stackTrace.apexTopLevelClassName);
         System.Assert.isNull(stackTrace.apexInnerClassName);
@@ -151,7 +157,8 @@ private class LoggerStackTrace_Tests {
 
         LoggerStackTrace stackTrace = new LoggerStackTrace(mockAnonymousApexStackTraceString);
 
-        System.Assert.areEqual(APEX_SOURCE_TYPE_ANONYMOUS_BLOCK, stackTrace.apexSourceType);
+        System.Assert.isNull(stackTrace.originSourceApiName);
+        System.Assert.areEqual(APEX_SOURCE_TYPE_ANONYMOUS_BLOCK, stackTrace.originSourceType);
         System.Assert.isNull(stackTrace.apexTriggerName);
         System.Assert.isNull(stackTrace.apexTopLevelClassName);
         System.Assert.isNull(stackTrace.apexInnerClassName);
@@ -168,13 +175,14 @@ private class LoggerStackTrace_Tests {
 
         LoggerStackTrace stackTrace = new LoggerStackTrace(duplicatedStackTraceString);
 
-        System.Assert.areEqual(APEX_SOURCE_TYPE_ANONYMOUS_BLOCK, stackTrace.apexSourceType);
+        System.Assert.isNull(stackTrace.originSourceApiName);
+        System.Assert.areEqual(APEX_SOURCE_TYPE_ANONYMOUS_BLOCK, stackTrace.originSourceType);
         System.Assert.isNull(stackTrace.apexTriggerName);
         System.Assert.isNull(stackTrace.apexTopLevelClassName);
         System.Assert.isNull(stackTrace.apexInnerClassName);
         System.Assert.areEqual(9, stackTrace.apexCodeLineNumber);
         System.Assert.isNull(stackTrace.apexMethodName);
-        System.Assert.areEqual(APEX_SOURCE_TYPE_ANONYMOUS_BLOCK, stackTrace.originLocation);
+        System.Assert.areEqual('AnonymousBlock', stackTrace.originLocation);
         System.Assert.areEqual(deduplicatedStackTraceString, stackTrace.parsedStackTraceString);
     }
 
@@ -184,7 +192,8 @@ private class LoggerStackTrace_Tests {
 
         LoggerStackTrace stackTrace = new LoggerStackTrace(emptyParenthesisStackTrace);
 
-        System.Assert.isNull(stackTrace.apexSourceType);
+        System.Assert.isNull(stackTrace.originSourceApiName);
+        System.Assert.isNull(stackTrace.originSourceType);
         System.Assert.isNull(stackTrace.apexTriggerName);
         System.Assert.isNull(stackTrace.apexTopLevelClassName);
         System.Assert.isNull(stackTrace.apexInnerClassName);
@@ -200,7 +209,8 @@ private class LoggerStackTrace_Tests {
 
         LoggerStackTrace stackTrace = new LoggerStackTrace(namespacedPparenthesisStackTrace);
 
-        System.Assert.isNull(stackTrace.apexSourceType);
+        System.Assert.isNull(stackTrace.originSourceApiName);
+        System.Assert.isNull(stackTrace.originSourceType);
         System.Assert.isNull(stackTrace.apexTriggerName);
         System.Assert.isNull(stackTrace.apexTopLevelClassName);
         System.Assert.isNull(stackTrace.apexInnerClassName);

@@ -14,9 +14,9 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
-                <fullName>AnonymousBlock</fullName>
+                <fullName>ApexAnonymousBlock</fullName>
                 <default>false</default>
-                <label>AnonymousBlock</label>
+                <label>ApexAnonymousBlock</label>
             </value>
             <value>
                 <fullName>ApexClass</fullName>

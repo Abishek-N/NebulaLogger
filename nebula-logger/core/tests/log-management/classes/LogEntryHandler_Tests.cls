@@ -523,7 +523,7 @@ private class LogEntryHandler_Tests {
             WHERE Id = :logEntry.Id
         ];
         System.Assert.areEqual(exampleTopLevelClassMethodName, logEntry.OriginLocation__c);
-        System.Assert.areEqual('Class', logEntry.OriginSourceType__c);
+        System.Assert.areEqual('ApexClass', logEntry.OriginSourceType__c);
         System.Assert.areEqual('v' + apexClass.ApiVersion, logEntry.OriginSourceApiVersion__c);
         System.Assert.areEqual(apexClass.CreatedBy.Username, logEntry.OriginSourceCreatedByUsername__c);
         System.Assert.areEqual(apexClass.CreatedDate, logEntry.OriginSourceCreatedDate__c);
@@ -614,7 +614,7 @@ private class LogEntryHandler_Tests {
             WHERE Id = :logEntry.Id
         ];
         System.Assert.areEqual(exampleInnerClassMethodName, logEntry.OriginLocation__c);
-        System.Assert.areEqual('Class', logEntry.OriginSourceType__c);
+        System.Assert.areEqual('ApexClass', logEntry.OriginSourceType__c);
         System.Assert.areEqual('v' + apexClass.ApiVersion, logEntry.OriginSourceApiVersion__c);
         System.Assert.areEqual(apexClass.CreatedBy.Username, logEntry.OriginSourceCreatedByUsername__c);
         System.Assert.areEqual(apexClass.CreatedDate, logEntry.OriginSourceCreatedDate__c);
@@ -698,7 +698,7 @@ private class LogEntryHandler_Tests {
             WHERE Id = :logEntry.Id
         ];
         System.Assert.areEqual(exampleTriggerName, logEntry.OriginLocation__c);
-        System.Assert.areEqual('Trigger', logEntry.OriginSourceType__c);
+        System.Assert.areEqual('ApexTrigger', logEntry.OriginSourceType__c);
         System.Assert.areEqual(targetCodeLineNumber, logEntry.OriginSourceLineNumber__c);
         System.Assert.isNull(logEntry.ApexClassLastModifiedDate__c);
         System.Assert.isNull(logEntry.ApexClassName__c);
@@ -822,7 +822,7 @@ private class LogEntryHandler_Tests {
         ];
         System.Assert.areEqual(exampleTopLevelClassMethodName, logEntry.OriginLocation__c);
         System.Assert.areEqual(exampleTopLevelClassName, logEntry.ExceptionSourceApiName__c);
-        System.Assert.areEqual('Class', logEntry.ExceptionSourceType__c);
+        System.Assert.areEqual('ApexClass', logEntry.ExceptionSourceType__c);
         System.Assert.areEqual('v' + apexClass.ApiVersion, logEntry.ExceptionSourceApiVersion__c);
         System.Assert.areEqual(apexClass.CreatedDate, logEntry.ExceptionSourceCreatedDate__c);
         System.Assert.areEqual(apexClass.Id, logEntry.ExceptionSourceId__c);
@@ -900,7 +900,7 @@ private class LogEntryHandler_Tests {
         ];
         System.Assert.areEqual(exampleInnerClassMethodName, logEntry.OriginLocation__c);
         System.Assert.areEqual(exampleTopLevelClassName, logEntry.ExceptionSourceApiName__c);
-        System.Assert.areEqual('Class', logEntry.ExceptionSourceType__c);
+        System.Assert.areEqual('ApexClass', logEntry.ExceptionSourceType__c);
         System.Assert.areEqual('v' + apexClass.ApiVersion, logEntry.ExceptionSourceApiVersion__c);
         System.Assert.areEqual(apexClass.CreatedDate, logEntry.ExceptionSourceCreatedDate__c);
         System.Assert.areEqual(apexClass.Id, logEntry.ExceptionSourceId__c);

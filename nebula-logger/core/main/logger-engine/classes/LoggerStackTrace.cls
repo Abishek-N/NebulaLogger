@@ -10,16 +10,11 @@
  * @see LogEntryBuilder
  */
 public without sharing class LoggerStackTrace {
-    private final static String SOURCE_TYPE_APEX_ANONYMOUS_BLOCK = 'AnonymousBlock';
+    private final static String SOURCE_TYPE_APEX_ANONYMOUS_BLOCK = 'ApexAnonymousBlock';
     private final static String SOURCE_TYPE_APEX_CLASS = 'ApexClass';
     private final static String SOURCE_TYPE_APEX_TRIGGER = 'ApexTrigger';
     private final static Set<String> IGNORED_APEX_CLASSES = new Set<String>{ LoggerStackTrace.class.getName() };
     private final static String NEW_LINE_DELIMITER = '\n';
-
-    /**
-     * @description The type of Apex that generated the stack trace (AnonymousBlock, Class, or Trigger)
-     */
-    public String apexSourceType { get; private set; }
 
     /**
      * @description The name of the Apex class that generated the stack trace
@@ -53,6 +48,16 @@ public without sharing class LoggerStackTrace {
      *              MyClass.someMethod, MyClass.MyInnerClass.someMethod, or AnonymousBlock
      */
     public String originLocation { get; private set; }
+
+    /**
+     * @description The API name of metadata that generated the stack trace
+     */
+    public String originSourceApiName { get; private set; }
+
+    /**
+     * @description The type of metadata that generated the stack trace
+     */
+    public String originSourceType { get; private set; }
 
     /**
      * @description The cleansed version of the platform-generated stack trace. This version has been cleansed
@@ -130,20 +135,22 @@ public without sharing class LoggerStackTrace {
                 this.apexCodeLineNumber = Integer.valueOf(apexCodeLineNumberString);
             }
 
-            if (cleanedOriginLocation == SOURCE_TYPE_APEX_ANONYMOUS_BLOCK) {
-                this.apexSourceType = SOURCE_TYPE_APEX_ANONYMOUS_BLOCK;
-            } else if (cleanedOriginLocation.startsWith(SOURCE_TYPE_APEX_CLASS + '.')) {
-                this.apexSourceType = SOURCE_TYPE_APEX_CLASS;
-                cleanedOriginLocation = cleanedOriginLocation.substringAfter(SOURCE_TYPE_APEX_CLASS + '.');
+            if (cleanedOriginLocation == 'AnonymousBlock') {
+                this.originSourceType = SOURCE_TYPE_APEX_ANONYMOUS_BLOCK;
+            } else if (cleanedOriginLocation.startsWith('Class.')) {
+                this.originSourceType = SOURCE_TYPE_APEX_CLASS;
+                cleanedOriginLocation = cleanedOriginLocation.substringAfter('Class.');
 
                 List<String> originLocationPieces = cleanedOriginLocation.split('\\.');
+                this.originSourceApiName = originLocationPieces.get(0);
                 this.apexTopLevelClassName = originLocationPieces.get(0);
                 this.apexInnerClassName = originLocationPieces.size() == 3 ? originLocationPieces.get(1) : null;
                 this.apexMethodName = originLocationPieces.size() >= 2 ? originLocationPieces.get(originLocationPieces.size() - 1) : null;
-            } else if (cleanedOriginLocation.startsWith(SOURCE_TYPE_APEX_TRIGGER + '.')) {
-                this.apexSourceType = SOURCE_TYPE_APEX_TRIGGER;
-                cleanedOriginLocation = cleanedOriginLocation.substringAfter(SOURCE_TYPE_APEX_TRIGGER + '.');
+            } else if (cleanedOriginLocation.startsWith('Trigger.')) {
+                this.originSourceType = SOURCE_TYPE_APEX_TRIGGER;
+                cleanedOriginLocation = cleanedOriginLocation.substringAfter('Trigger.');
 
+                this.originSourceApiName = cleanedOriginLocation;
                 this.apexTriggerName = cleanedOriginLocation;
             }
 
