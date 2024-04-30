@@ -91,7 +91,7 @@
         "@xmldom/xmldom": ">=0.8.4",
         "ansi-regex": ">=5.0.1",
         "async": ">=2.6.4",
-        "ejs": ">=3.1.7",
+        "ejs": ">=3.1.10",
         "fast-xml-parser": ">=4.1.2",
         "follow-redirects": ">=1.14.8",
         "glob-parent": ">=5.1.2",
